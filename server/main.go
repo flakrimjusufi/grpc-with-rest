@@ -21,7 +21,7 @@ func NewServer() *server {
 }
 
 func (s *server) SayHello(ctx context.Context, in *helloworldpb.HelloRequest) (*helloworldpb.HelloReply, error) {
-	return &helloworldpb.HelloReply{Message: in.Name + " world"}, nil
+	return &helloworldpb.HelloReply{Message: in.Name}, nil
 }
 
 func main() {
