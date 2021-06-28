@@ -12,7 +12,7 @@ import (
 	helloworldpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 )
 
-type server struct{
+type server struct {
 	helloworldpb.UnimplementedGreeterServer
 }
 
