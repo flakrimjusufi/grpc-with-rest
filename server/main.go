@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc"
@@ -19,6 +20,10 @@ type User struct {
 	Name        string
 	Email       string
 	PhoneNumber string
+}
+
+type ListAllUsers struct {
+	User []*User
 }
 
 type userServer struct {
@@ -41,7 +46,7 @@ func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.
 	phoneNumber := in.GetPhoneNumber()
 
 	var user User
-	db.Connect().Where("name =?", name).Find(&user)
+	database.Where("name =?", name).Find(&user)
 
 	user.Email = email
 	user.PhoneNumber = phoneNumber
@@ -51,12 +56,24 @@ func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
+	name := in.GetName()
+	var user User
+	database.Where("name =?", name).Find(&user)
+	database.Debug().Delete(&user)
+
+	return &userpb.Message{Message: user.Name + " Deleted successfully!"}, nil
 }
 
-func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
+
+	list := make([]*userpb.User, 0)
+	database.Debug().Table("users").Find(&list)
+	fmt.Println("{}", list)
+
+	return &userpb.ListUser{
+		Users: list,
+	}, nil
 }
 
 func main() {

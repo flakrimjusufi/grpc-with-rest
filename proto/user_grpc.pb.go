@@ -20,8 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
-	DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
-	ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
+	DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
+	ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*ListUser, error)
 }
 
 type userServiceClient struct {
@@ -50,8 +50,8 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *User, opts ...gr
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
+func (c *userServiceClient) DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
 	err := c.cc.Invoke(ctx, "/helloworld.UserService/DeleteUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -59,8 +59,8 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *User, opts ...gr
 	return out, nil
 }
 
-func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
+func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*ListUser, error) {
+	out := new(ListUser)
 	err := c.cc.Invoke(ctx, "/helloworld.UserService/ListUsers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,8 +74,8 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grp
 type UserServiceServer interface {
 	CreateUser(context.Context, *User) (*User, error)
 	UpdateUser(context.Context, *User) (*User, error)
-	DeleteUser(context.Context, *User) (*User, error)
-	ListUsers(context.Context, *User) (*User, error)
+	DeleteUser(context.Context, *User) (*Message, error)
+	ListUsers(context.Context, *User) (*ListUser, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -89,10 +89,10 @@ func (UnimplementedUserServiceServer) CreateUser(context.Context, *User) (*User,
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *User) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteUser(context.Context, *User) (*User, error) {
+func (UnimplementedUserServiceServer) DeleteUser(context.Context, *User) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedUserServiceServer) ListUsers(context.Context, *User) (*User, error) {
+func (UnimplementedUserServiceServer) ListUsers(context.Context, *User) (*ListUser, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUsers not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

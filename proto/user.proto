@@ -19,13 +19,13 @@ service UserService {
       body: "*"
     };
   }
-  rpc DeleteUser (User) returns (User) {
+  rpc DeleteUser (User) returns (Message) {
     option (google.api.http) = {
       post: "/user/delete"
       body: "*"
     };
   }
-  rpc ListUsers (User) returns (User) {
+  rpc ListUsers (User) returns (ListUser) {
     option (google.api.http) = {
       get: "/user/list"
     };
@@ -37,5 +37,13 @@ message User {
   string name = 2;
   string email = 3;
   string phoneNumber = 4;
+}
+
+message Message {
+  string message = 1;
+}
+
+message ListUser {
+  repeated User users = 1;
 }
 
