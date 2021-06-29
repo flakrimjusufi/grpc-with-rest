@@ -2,26 +2,53 @@ package main
 
 import (
 	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jinzhu/gorm"
+	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
-
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-
+	db "server/main.go/database"
 	userpb "server/main.go/proto"
 )
+
+var database = db.Connect()
+
+type User struct {
+	gorm.Model
+	Name        string
+	Email       string
+	PhoneNumber string
+}
 
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
 }
 
 func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+	user := User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}
+
+	database.NewRecord(user)
+	database.Debug().Create(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
 func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+
+	name := in.GetName()
+	email := in.GetEmail()
+	phoneNumber := in.GetPhoneNumber()
+
+	var user User
+	db.Connect().Where("name =?", name).Find(&user)
+
+	user.Email = email
+	user.PhoneNumber = phoneNumber
+
+	database.Debug().Save(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
 func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
@@ -73,6 +100,10 @@ func main() {
 		Addr:    ":8090",
 		Handler: gwmux,
 	}
+
+	//Auto-Migration of User Model
+	database.AutoMigrate(&User{})
+	defer database.Close()
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
 	log.Fatalln(gwServer.ListenAndServe())
