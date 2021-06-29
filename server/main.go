@@ -9,19 +9,27 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
-	helloworldpb "github.com/flakrimjusufi/grpc-with-rest/proto"
+	userpb "server/main.go/proto"
 )
 
-type server struct{
-	helloworldpb.UnimplementedGreeterServer
+type userServer struct {
+	userpb.UnimplementedUserServiceServer
 }
 
-func NewServer() *server {
-	return &server{}
+func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
 }
 
-func (s *server) SayHello(ctx context.Context, in *helloworldpb.HelloRequest) (*helloworldpb.HelloReply, error) {
-	return &helloworldpb.HelloReply{Message: in.Name}, nil
+func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+}
+
+func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
+}
+
+func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	return &userpb.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}, nil
 }
 
 func main() {
@@ -33,8 +41,9 @@ func main() {
 
 	// Create a gRPC server object
 	s := grpc.NewServer()
-	// Attach the Greeter service to the server
-	helloworldpb.RegisterGreeterServer(s, &server{})
+	// Attach the User service to the server
+	userpb.RegisterUserServiceServer(s, &userServer{})
+
 	// Serve gRPC server
 	log.Println("Serving gRPC on 0.0.0.0:8080")
 	go func() {
@@ -55,7 +64,7 @@ func main() {
 
 	gwmux := runtime.NewServeMux()
 	// Register Greeter
-	err = helloworldpb.RegisterGreeterHandler(context.Background(), gwmux, conn)
+	err = userpb.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}

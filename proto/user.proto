@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package helloworld;
+
+option go_package = "/proto";
+
+import "google/api/annotations.proto";
+
+service UserService {
+  rpc CreateUser (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/create"
+      body: "*"
+    };
+  }
+  rpc UpdateUser (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/update"
+      body: "*"
+    };
+  }
+  rpc DeleteUser (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/delete"
+      body: "*"
+    };
+  }
+  rpc ListUsers (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/list"
+    };
+  }
+}
+
+message User {
+  uint32 id = 1;
+  string name = 2;
+  string email = 3;
+  string phoneNumber = 4;
+}
+
