@@ -2,26 +2,74 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jinzhu/gorm"
+	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
-
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-
-	helloworldpb "github.com/flakrimjusufi/grpc-with-rest/proto"
+	db "server/main.go/database"
+	userpb "server/main.go/proto"
 )
 
-type server struct{
-	helloworldpb.UnimplementedGreeterServer
+var database = db.Connect()
+
+type User struct {
+	gorm.Model
+	Name        string
+	Email       string
+	PhoneNumber string
 }
 
-func NewServer() *server {
-	return &server{}
+type userServer struct {
+	userpb.UnimplementedUserServiceServer
 }
 
-func (s *server) SayHello(ctx context.Context, in *helloworldpb.HelloRequest) (*helloworldpb.HelloReply, error) {
-	return &helloworldpb.HelloReply{Message: in.Name}, nil
+func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	user := User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}
+
+	database.NewRecord(user)
+	database.Debug().Create(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+}
+
+func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+
+	name := in.GetName()
+	email := in.GetEmail()
+	phoneNumber := in.GetPhoneNumber()
+
+	var user User
+	database.Where("name =?", name).Find(&user)
+
+	user.Email = email
+	user.PhoneNumber = phoneNumber
+
+	database.Debug().Save(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+}
+
+func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
+	name := in.GetName()
+	var user User
+	database.Where("name =?", name).Find(&user)
+	database.Debug().Delete(&user)
+
+	return &userpb.Message{Message: user.Name + " Deleted successfully!"}, nil
+}
+
+func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
+
+	list := make([]*userpb.User, 0)
+	database.Debug().Where("deleted_at is null").Find(&list)
+	fmt.Println("{}", list)
+
+	return &userpb.ListUser{
+		Users: list,
+	}, nil
 }
 
 func main() {
@@ -33,8 +81,9 @@ func main() {
 
 	// Create a gRPC server object
 	s := grpc.NewServer()
-	// Attach the Greeter service to the server
-	helloworldpb.RegisterGreeterServer(s, &server{})
+	// Attach the User service to the server
+	userpb.RegisterUserServiceServer(s, &userServer{})
+
 	// Serve gRPC server
 	log.Println("Serving gRPC on 0.0.0.0:8080")
 	go func() {
@@ -55,7 +104,7 @@ func main() {
 
 	gwmux := runtime.NewServeMux()
 	// Register Greeter
-	err = helloworldpb.RegisterGreeterHandler(context.Background(), gwmux, conn)
+	err = userpb.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
@@ -64,6 +113,10 @@ func main() {
 		Addr:    ":8090",
 		Handler: gwmux,
 	}
+
+	//Auto-Migration of User Model
+	database.AutoMigrate(&User{})
+	defer database.Close()
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
 	log.Fatalln(gwServer.ListenAndServe())
