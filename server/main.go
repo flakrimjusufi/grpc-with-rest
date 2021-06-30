@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc"
@@ -24,6 +23,10 @@ type User struct {
 
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
+}
+
+func (as *userServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
+	return &userpb.Message{Message: "Hello " + in.Name}, nil
 }
 
 func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
@@ -65,8 +68,6 @@ func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.L
 
 	list := make([]*userpb.User, 0)
 	database.Debug().Where("deleted_at is null").Find(&list)
-	fmt.Println("{}", list)
-
 	return &userpb.ListUser{
 		Users: list,
 	}, nil

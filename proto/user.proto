@@ -30,6 +30,12 @@ service UserService {
       get: "/user/list"
     };
   }
+  rpc SayHello (User) returns (Message) {
+    option (google.api.http) = {
+      post: "/v1/example/echo"
+      body: "*"
+    };
+  }
 }
 
 message User {
