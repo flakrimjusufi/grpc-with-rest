@@ -22,6 +22,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
 	ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*ListUser, error)
+	SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
 }
 
 type userServiceClient struct {
@@ -68,6 +69,15 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grp
 	return out, nil
 }
 
+func (c *userServiceClient) SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/helloworld.UserService/SayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *User) (*User, error)
 	DeleteUser(context.Context, *User) (*Message, error)
 	ListUsers(context.Context, *User) (*ListUser, error)
+	SayHello(context.Context, *User) (*Message, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedUserServiceServer) DeleteUser(context.Context, *User) (*Messa
 }
 func (UnimplementedUserServiceServer) ListUsers(context.Context, *User) (*ListUser, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedUserServiceServer) SayHello(context.Context, *User) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -180,6 +194,24 @@ func _UserService_ListUsers_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).SayHello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helloworld.UserService/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).SayHello(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +234,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUsers",
 			Handler:    _UserService_ListUsers_Handler,
+		},
+		{
+			MethodName: "SayHello",
+			Handler:    _UserService_SayHello_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
