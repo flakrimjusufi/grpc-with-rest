@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
+	"os"
 	db "server/main.go/database"
 	userpb "server/main.go/proto"
 )
@@ -111,7 +113,7 @@ func main() {
 	}
 
 	gwServer := &http.Server{
-		Addr:    ":8090",
+		Addr:    fmt.Sprintf(":%s", os.Getenv("port")),
 		Handler: gwmux,
 	}
 
@@ -119,6 +121,6 @@ func main() {
 	database.AutoMigrate(&User{})
 	defer database.Close()
 
-	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
+	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("host"), os.Getenv("port")))
 	log.Fatalln(gwServer.ListenAndServe())
 }
