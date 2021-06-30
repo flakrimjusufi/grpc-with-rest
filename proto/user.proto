@@ -30,6 +30,16 @@ service UserService {
       get: "/user/list"
     };
   }
+  rpc GetUserByName (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/findByName/{name}"
+    };
+  }
+  rpc GetUserById (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/findById/{id}"
+    };
+  }
   rpc SayHello (User) returns (Message) {
     option (google.api.http) = {
       post: "/v1/example/echo"

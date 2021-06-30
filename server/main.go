@@ -75,6 +75,22 @@ func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.L
 	}, nil
 }
 
+func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	name := in.GetName()
+	var user User
+	database.Debug().Where(&User{Name: name}).Find(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+}
+
+func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	id := in.GetId()
+	var user User
+	database.Debug().Where("id = ?", id).Find(&user)
+
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+}
+
 func main() {
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
