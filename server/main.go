@@ -22,10 +22,6 @@ type User struct {
 	PhoneNumber string
 }
 
-type ListAllUsers struct {
-	User []*User
-}
-
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
 }
@@ -68,7 +64,7 @@ func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Debug().Table("users").Find(&list)
+	database.Debug().Where("deleted_at is null").Find(&list)
 	fmt.Println("{}", list)
 
 	return &userpb.ListUser{
