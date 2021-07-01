@@ -109,6 +109,7 @@ func main() {
 		log.Fatalln(s.Serve(lis))
 	}()
 
+	maxMsgSize := 1024*1024*20
 	// Create a client connection to the gRPC server we just started
 	// This is where the gRPC-Gateway proxies the requests
 	conn, err := grpc.DialContext(
@@ -116,6 +117,7 @@ func main() {
 		"0.0.0.0:8080",
 		grpc.WithBlock(),
 		grpc.WithInsecure(),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize), grpc.MaxCallSendMsgSize(maxMsgSize)),
 	)
 	if err != nil {
 		log.Fatalln("Failed to dial server:", err)

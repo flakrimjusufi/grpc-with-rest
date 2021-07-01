@@ -16,10 +16,10 @@ type User struct {
 
 func main() {
 
-	var db = database.Connect().Debug()
+	var db = database.Connect()
 	db.AutoMigrate(&User{})
 
-	numberOfRecords := 10
+	numberOfRecords := 100000
 	count := 1
 	for i := 1; i <= numberOfRecords; i++ {
 		gofakeit.Seed(0)
