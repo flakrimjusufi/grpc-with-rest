@@ -69,7 +69,7 @@ func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Where("deleted_at is null").Find(&list)
+	database.Where("deleted_at is null").Order("created_at desc").Find(&list)
 	return &userpb.ListUser{
 		Users: list,
 	}, nil
