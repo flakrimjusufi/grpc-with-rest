@@ -14,7 +14,7 @@ import (
 	userpb "server/main.go/proto"
 )
 
-var database = db.Connect()
+var database = db.Connect().Debug()
 
 type User struct {
 	gorm.Model
@@ -35,7 +35,7 @@ func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.
 	user := User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}
 
 	database.NewRecord(user)
-	database.Debug().Create(&user)
+	database.Create(&user)
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -52,7 +52,7 @@ func (as *userServer) UpdateUser(ctx context.Context, in *userpb.User) (*userpb.
 	user.Email = email
 	user.PhoneNumber = phoneNumber
 
-	database.Debug().Save(&user)
+	database.Save(&user)
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -69,7 +69,7 @@ func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Debug().Where("deleted_at is null").Find(&list)
+	database.Where("deleted_at is null").Find(&list)
 	return &userpb.ListUser{
 		Users: list,
 	}, nil
@@ -78,7 +78,7 @@ func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.L
 func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	name := in.GetName()
 	var user User
-	database.Debug().Where(&User{Name: name}).Find(&user)
+	database.Where(&User{Name: name}).Find(&user)
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -86,7 +86,7 @@ func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	id := in.GetId()
 	var user User
-	database.Debug().Where("id = ?", id).Find(&user)
+	database.Where("id = ?", id).Find(&user)
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
