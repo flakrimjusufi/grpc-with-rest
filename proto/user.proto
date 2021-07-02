@@ -13,9 +13,15 @@ service UserService {
       body: "*"
     };
   }
-  rpc UpdateUser (User) returns (User) {
+  rpc UpdateUserByName (User) returns (User) {
     option (google.api.http) = {
-      post: "/user/update"
+      post: "/user/updateByName/{name}"
+      body: "*"
+    };
+  }
+  rpc UpdateUserById (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/updateById/{id}"
       body: "*"
     };
   }
