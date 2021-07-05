@@ -136,7 +136,7 @@ func main() {
 	}
 
 	gwmux := runtime.NewServeMux()
-	// Register Greeter
+	// Register User Service
 	err = userpb.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
