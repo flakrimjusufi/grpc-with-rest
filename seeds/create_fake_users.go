@@ -2,32 +2,47 @@ package main
 
 import (
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/jinzhu/gorm"
 	"log"
 	"server/main.go/database"
+	"time"
 )
 
-type User struct {
-	gorm.Model
+type CreditCards struct {
+	ID          uint `gorm:"primary_key"`
 	Name        string
 	Email       string
 	PhoneNumber string
+	Address     string
+	Country     string
+	City        string
+	Zip         string
+	CVV         string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   time.Time
 }
 
 func main() {
 
 	var db = database.Connect()
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&CreditCards{})
 
-	numberOfRecords := 100000
+	numberOfRecords := 100
 	count := 1
 	for i := 1; i <= numberOfRecords; i++ {
 		gofakeit.Seed(0)
 		name := gofakeit.Name()
 		email := gofakeit.Email()
 		phone := gofakeit.Phone()
+		address := gofakeit.Address().Address
+		country := gofakeit.Address().Country
+		city := gofakeit.Address().City
+		zip := gofakeit.Address().Zip
+		cvv := gofakeit.CreditCardCvv()
+		createdAt := time.Now()
 
-		db.Create(&User{Name: name, Email: email, PhoneNumber: phone})
+		db.Create(&CreditCards{Name: name, Email: email, PhoneNumber: phone, Address: address, Country: country,
+			City: city, Zip: zip, CVV: cvv, CreatedAt: createdAt})
 		count = i
 	}
 	defer db.Close()
