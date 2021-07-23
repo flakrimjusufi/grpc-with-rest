@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
 	"net/http"
@@ -14,10 +15,24 @@ import (
 	userpb "server/main.go/proto"
 )
 
-var database = db.Connect().Debug()
+const (
+	address     = "localhost:8080"
+	colorRed    = "\033[31m"
+	colorGreen  = "\033[32m"
+	colorWhite  = "\033[37m"
+	colorPurple = "\033[35m"
+	colorBlue   = "\033[34m"
+	colorYellow = "\033[33m"
+)
+
+var database = db.Connect()
 
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
+}
+
+type creditCardServer struct {
+	userpb.UnimplementedCreditCardServiceServer
 }
 
 func (as *userServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
@@ -88,6 +103,13 @@ func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.L
 }
 
 func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	fmt.Println(colorYellow, "__________________________________________________________________________________"+
+		"_______________________________________________________________________________________________________")
+	log.Println(colorPurple, "[userService] - [rpc GetUserByName] -> ", colorBlue, "Received person's name: ", in.GetName())
+	fmt.Println(colorYellow, "__________________________________________________________________________________"+
+		"_______________________________________________________________________________________________________")
 	name := in.GetName()
 	var user models.User
 	database.Where(&models.User{Name: name}).Find(&user)
@@ -103,6 +125,44 @@ func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
+func (as *userServer) FindUserFromGetUserByIdRPC(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+
+	user, _ := as.GetUserById(ctx, in)
+
+	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(), PhoneNumber: user.GetPhoneNumber()}, nil
+}
+
+func (as *userServer) FindUserFromGetUserByNameRPC(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+
+	user, _ := as.GetUserByName(ctx, in)
+
+	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(), PhoneNumber: user.GetPhoneNumber()}, nil
+}
+
+func (fu *creditCardServer) CreditCards(ctx context.Context, in *userpb.CreditCard) (*userpb.ListCreditCards, error) {
+
+	var list []*userpb.CreditCard
+	database.Order("created_at desc").Find(&list)
+
+	return &userpb.ListCreditCards{
+		CreditCards: list,
+	}, nil
+}
+
+func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *userpb.CreditCard) (*userpb.CreditCard, error) {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	name := in.GetName()
+	var creditCard models.CreditCards
+	database.Where(&models.CreditCards{Name: name}).Find(&creditCard)
+
+	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen, "Now sending the response (credit card of selected user) to client side...")
+
+	return &userpb.CreditCard{Id: uint32(creditCard.ID), Name: creditCard.Name, Email: creditCard.Email, PhoneNumber: creditCard.PhoneNumber,
+		Address: creditCard.Address, Country: creditCard.Country, City: creditCard.City, Zip: creditCard.Zip, Cvv: creditCard.CVV,
+		CreatedAt: timestamppb.New(creditCard.CreatedAt)}, nil
+}
+
 func main() {
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
@@ -114,6 +174,7 @@ func main() {
 	s := grpc.NewServer()
 	// Attach the User service to the server
 	userpb.RegisterUserServiceServer(s, &userServer{})
+	userpb.RegisterCreditCardServiceServer(s, &creditCardServer{})
 
 	// Serve gRPC server
 	log.Println("Serving gRPC on 0.0.0.0:8080")
@@ -140,6 +201,10 @@ func main() {
 	err = userpb.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
+	}
+	newServer := userpb.RegisterCreditCardServiceHandler(context.Background(), gwmux, conn)
+	if newServer != nil {
+		log.Fatalln("Failed to register gateway:", newServer)
 	}
 
 	gwServer := &http.Server{
