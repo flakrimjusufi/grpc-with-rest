@@ -9,7 +9,7 @@ The server and client side is all defined in _/proto/user.proto._
 
 Basically, what this app does is described in the picture below:
 
-![](/home/flakrim/go/src/grpc-with-rest/images/architecture_introduction_diagram.jpg)
+![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/architecture_introduction_diagram.jpg)
 
 
 ## Pre-requisites 
