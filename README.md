@@ -1,9 +1,9 @@
 # grpc-with-rest
 
-This is a gRPC app build with Go, gRPC-Gateway and ProtoBuff using HTTP as transport layer.
+This is a gRPC app build with Go, [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway) and [ProtoBuff](https://developers.google.com/protocol-buffers) using HTTP as transport layer.
 It was build with the purpose of having both gRPC and RESTful style integrated.
 
-grpc-with-rest performs a transcoding of HTTP calls to gRPC using a proxy server.
+grpc-with-rest performs a [transcoding of HTTP calls to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) using a proxy server.
 
 The server and client side is all defined in _/proto/user.proto._
 
