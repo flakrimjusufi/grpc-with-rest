@@ -142,7 +142,25 @@ func (as *userServer) FindUserFromGetUserByNameRPC(ctx context.Context, in *user
 func (fu *creditCardServer) CreditCards(ctx context.Context, in *userpb.CreditCard) (*userpb.ListCreditCards, error) {
 
 	var list []*userpb.CreditCard
-	database.Order("created_at desc").Find(&list)
+	var creditCards []*models.CreditCards
+	database.Order("created_at desc").Find(&creditCards)
+
+	for _, card := range creditCards {
+		list = append(list, &userpb.CreditCard{
+			Id:          uint32(card.ID),
+			Name:        card.Name,
+			Email:       card.Email,
+			PhoneNumber: card.PhoneNumber,
+			Address:     card.Address,
+			Country:     card.Country,
+			City:        card.City,
+			Zip:         card.Zip,
+			Cvv:         card.CVV,
+			CreatedAt:   timestamppb.New(card.CreatedAt),
+			UpdatedAt:   timestamppb.New(card.UpdatedAt),
+			DeletedAt:   timestamppb.New(card.DeletedAt),
+		})
+	}
 
 	return &userpb.ListCreditCards{
 		CreditCards: list,
