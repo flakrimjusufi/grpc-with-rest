@@ -230,10 +230,6 @@ func main() {
 		Handler: gwmux,
 	}
 
-	//Auto-Migration of User Model
-	database.AutoMigrate(&models.User{})
-	defer database.Close()
-
 	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("server_host"), os.Getenv("server_port")))
 	log.Fatalln(gwServer.ListenAndServe())
 }

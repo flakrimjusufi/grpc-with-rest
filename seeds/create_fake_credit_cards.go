@@ -5,13 +5,13 @@ import (
 	"log"
 	"server/main.go/database"
 	"server/main.go/models"
+	"time"
 )
-
 
 func main() {
 
 	var db = database.Connect()
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.CreditCards{})
 
 	numberOfRecords := 100
 	count := 1
@@ -20,8 +20,15 @@ func main() {
 		name := gofakeit.Name()
 		email := gofakeit.Email()
 		phone := gofakeit.Phone()
+		address := gofakeit.Address().Address
+		country := gofakeit.Address().Country
+		city := gofakeit.Address().City
+		zip := gofakeit.Address().Zip
+		cvv := gofakeit.CreditCardCvv()
+		createdAt := time.Now()
 
-		db.Create(&models.User{Name: name, Email: email, PhoneNumber: phone})
+		db.Create(&models.CreditCards{Name: name, Email: email, PhoneNumber: phone, Address: address, Country: country,
+			City: city, Zip: zip, CVV: cvv, CreatedAt: createdAt})
 		count = i
 	}
 	defer db.Close()
