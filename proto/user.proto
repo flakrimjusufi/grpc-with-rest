@@ -5,6 +5,7 @@ package helloworld;
 option go_package = "/proto";
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 service UserService {
   rpc CreateUser (User) returns (User) {
@@ -13,9 +14,15 @@ service UserService {
       body: "*"
     };
   }
-  rpc UpdateUser (User) returns (User) {
+  rpc UpdateUserByName (User) returns (User) {
     option (google.api.http) = {
-      post: "/user/update"
+      post: "/user/updateByName/{name}"
+      body: "*"
+    };
+  }
+  rpc UpdateUserById (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/updateById/{id}"
       body: "*"
     };
   }
@@ -30,10 +37,45 @@ service UserService {
       get: "/user/list"
     };
   }
+  rpc GetUserByName (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/findByName/{name}"
+    };
+  }
+  rpc GetUserById (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/findById/{id}"
+    };
+  }
   rpc SayHello (User) returns (Message) {
     option (google.api.http) = {
       post: "/v1/example/echo"
       body: "*"
+    };
+  }
+  rpc FindUserFromGetUserByIdRPC (User) returns (User) {
+    option (google.api.http) = {
+      get: "/user/findUserFromGetUserByIdRPC/{id}"
+    };
+  }
+
+  rpc FindUserFromGetUserByNameRPC (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/findUserFromGetUserNameRPC"
+      body: "*"
+    };
+  }
+}
+
+service CreditCardService{
+  rpc CreditCards (CreditCard) returns (ListCreditCards) {
+    option (google.api.http) = {
+      get: "/card/listCreditCards"
+    };
+  }
+  rpc GetCreditCardByUserName (CreditCard) returns (CreditCard) {
+    option (google.api.http) = {
+      get: "/card/findByUserName/{name}"
     };
   }
 }
@@ -53,3 +95,21 @@ message ListUser {
   repeated User users = 1;
 }
 
+message CreditCard {
+  uint32 id = 1;
+  string name = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string address = 5;
+  string country = 6;
+  string city = 7;
+  string zip = 8;
+  string cvv = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+  google.protobuf.Timestamp deleted_at = 12;
+}
+
+message ListCreditCards {
+  repeated CreditCard credit_cards = 1;
+}
