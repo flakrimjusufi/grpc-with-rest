@@ -7,6 +7,11 @@ grpc-with-rest performs a transcoding of HTTP calls to gRPC using a proxy server
 
 The server and client side is all defined in _/proto/user.proto._
 
+Basically, what this app does is described in the picture below:
+
+![](/home/flakrim/go/src/grpc-with-rest/images/architecture_introduction_diagram.jpg)
+
+
 ## Pre-requisites 
 
 ### 1. Go
@@ -17,7 +22,7 @@ For installation instructions, see Go's getting started guide: https://golang.or
 
 ### 2. PostgreSQL
 ~~~~
-[Version 10+]
+[Version 9+]
 For installation instructions, please refer to this link: https://www.postgresql.org/download/
 ~~~~
 
@@ -64,3 +69,48 @@ You should have a response from server:
   "message": "Hello Flakrim"
 }
 ~~~~
+
+## Populate the database 
+
+### To interact with data, we are using:
+
+- **gORM** [[https://gorm.io/]] library to interact with our database. 
+- **gofakeit** [[https://github.com/brianvoe/gofakeit]] library to populate our database.
+
+There are two data models which we are using in this app: 
+- users (which can be found under[ /models/data_struct.go](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/models/data_struct.go))
+- credit_cards (which can also be found under [ /models/data_struct.go](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/models/data_struct.go))
+
+### There are two seed scripts for populating the database:
+- [create_fake_users.go](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/seeds/create_fake_users.go)
+- [create_fake_credit_cards.go](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/seeds/create_fake_credit_cards.go)
+
+#### To execute the script which populates the database with fake users, run this command:
+~~~
+go run seeds/create_fake_users.go
+
+** This command will auto-migrate user data struct and will create a table in database named users, afterwards will populate the table with fake users. 
+~~~
+
+#### To execute the scripts which populates the database with fake credit cards, run this command:
+~~~
+go run seeds/create_fake_credit_cards.go 
+
+** This command will auto-migrate credit_card data struct and will create a table in database named creidt_cards, afterwards will populate the table with fake credit cards. 
+~~~
+
+
+## Available HTTP endpoints
+
+After populating the database, you can use the below endpoints to hit the reverse proxy server and to get the data from the server:
+
+| HTTP call        | Endpoint           | Description  |
+| :-------------: |:-------------:| :-----:|
+| POST     | http://localhost:8090/user/create | Will create a user in database |
+| GET      | http://localhost:8090/user/findByName/Flakrim      |  Will find a user by name in database |
+| GET | http://localhost:8090/user/findById/120023      |   Will find a user by Id in database |
+| GET | http://localhost:8090/user/list     |   Will find all the user in database |
+| POST | http://localhost:8090/user/updateById/12003     |   Will update a user by Id in database |
+| POST | http://localhost:8090/user/delete     |   Will delete a user by name in database |
+| GET | http://localhost:8090/card/listCreditCards     |   Will list all credit cards in database |
+| GET | http://localhost:8090/card/findByUserName/Flakrim     |   Will find a credit card by user name in database |
