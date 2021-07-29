@@ -226,7 +226,7 @@ func main() {
 	}
 
 	gwServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", os.Getenv("port")),
+		Addr:    fmt.Sprintf(":%s", os.Getenv("server_port")),
 		Handler: gwmux,
 	}
 
@@ -234,6 +234,6 @@ func main() {
 	database.AutoMigrate(&models.User{})
 	defer database.Close()
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("host"), os.Getenv("port")))
+	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("server_host"), os.Getenv("server_port")))
 	log.Fatalln(gwServer.ListenAndServe())
 }
