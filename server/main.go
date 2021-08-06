@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	db "server/main.go/database"
 	models "server/main.go/models"
 	userpb "server/main.go/proto"
@@ -25,7 +27,7 @@ const (
 	colorYellow = "\033[33m"
 )
 
-var database = db.Connect()
+var database = db.Connect().Debug()
 
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
@@ -33,6 +35,30 @@ type userServer struct {
 
 type creditCardServer struct {
 	userpb.UnimplementedCreditCardServiceServer
+}
+
+func allowedOrigin(origin string) bool {
+	if viper.GetString("cors") == "*" {
+		return true
+	}
+	if matched, _ := regexp.MatchString(viper.GetString("cors"), origin); matched {
+		return true
+	}
+	return false
+}
+
+func cors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if allowedOrigin(r.Header.Get("Origin")) {
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
+		}
+		if r.Method == "OPTIONS" {
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func (as *userServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
@@ -96,7 +122,7 @@ func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Where("deleted_at is null").Order("created_at desc").Find(&list)
+	database.Where("deleted_at is null").Order("created_at desc").Limit(100).Find(&list)
 	return &userpb.ListUser{
 		Users: list,
 	}, nil
@@ -227,7 +253,7 @@ func main() {
 
 	gwServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("server_port")),
-		Handler: gwmux,
+		Handler: cors(gwmux),
 	}
 
 	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("server_host"), os.Getenv("server_port")))
