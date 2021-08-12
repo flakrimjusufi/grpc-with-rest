@@ -430,6 +430,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 type CreditCardServiceClient interface {
 	CreditCards(ctx context.Context, in *CreditCard, opts ...grpc.CallOption) (*ListCreditCards, error)
 	GetCreditCardByUserName(ctx context.Context, in *CreditCard, opts ...grpc.CallOption) (*CreditCard, error)
+	CreateCreditCardApplication(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error)
+	GetCreditCardApplicationByName(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error)
 }
 
 type creditCardServiceClient struct {
@@ -458,12 +460,32 @@ func (c *creditCardServiceClient) GetCreditCardByUserName(ctx context.Context, i
 	return out, nil
 }
 
+func (c *creditCardServiceClient) CreateCreditCardApplication(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error) {
+	out := new(CreditCardApplication)
+	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/CreateCreditCardApplication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *creditCardServiceClient) GetCreditCardApplicationByName(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error) {
+	out := new(CreditCardApplication)
+	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/GetCreditCardApplicationByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CreditCardServiceServer is the server API for CreditCardService service.
 // All implementations must embed UnimplementedCreditCardServiceServer
 // for forward compatibility
 type CreditCardServiceServer interface {
 	CreditCards(context.Context, *CreditCard) (*ListCreditCards, error)
 	GetCreditCardByUserName(context.Context, *CreditCard) (*CreditCard, error)
+	CreateCreditCardApplication(context.Context, *CreditCardApplication) (*CreditCardApplication, error)
+	GetCreditCardApplicationByName(context.Context, *CreditCardApplication) (*CreditCardApplication, error)
 	mustEmbedUnimplementedCreditCardServiceServer()
 }
 
@@ -476,6 +498,12 @@ func (UnimplementedCreditCardServiceServer) CreditCards(context.Context, *Credit
 }
 func (UnimplementedCreditCardServiceServer) GetCreditCardByUserName(context.Context, *CreditCard) (*CreditCard, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCreditCardByUserName not implemented")
+}
+func (UnimplementedCreditCardServiceServer) CreateCreditCardApplication(context.Context, *CreditCardApplication) (*CreditCardApplication, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCreditCardApplication not implemented")
+}
+func (UnimplementedCreditCardServiceServer) GetCreditCardApplicationByName(context.Context, *CreditCardApplication) (*CreditCardApplication, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCreditCardApplicationByName not implemented")
 }
 func (UnimplementedCreditCardServiceServer) mustEmbedUnimplementedCreditCardServiceServer() {}
 
@@ -526,6 +554,42 @@ func _CreditCardService_GetCreditCardByUserName_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CreditCardService_CreateCreditCardApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreditCardApplication)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CreditCardServiceServer).CreateCreditCardApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helloworld.CreditCardService/CreateCreditCardApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CreditCardServiceServer).CreateCreditCardApplication(ctx, req.(*CreditCardApplication))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CreditCardService_GetCreditCardApplicationByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreditCardApplication)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CreditCardServiceServer).GetCreditCardApplicationByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helloworld.CreditCardService/GetCreditCardApplicationByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CreditCardServiceServer).GetCreditCardApplicationByName(ctx, req.(*CreditCardApplication))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CreditCardService_ServiceDesc is the grpc.ServiceDesc for CreditCardService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -540,6 +604,14 @@ var CreditCardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCreditCardByUserName",
 			Handler:    _CreditCardService_GetCreditCardByUserName_Handler,
+		},
+		{
+			MethodName: "CreateCreditCardApplication",
+			Handler:    _CreditCardService_CreateCreditCardApplication_Handler,
+		},
+		{
+			MethodName: "GetCreditCardApplicationByName",
+			Handler:    _CreditCardService_GetCreditCardApplicationByName_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

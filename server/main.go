@@ -207,6 +207,99 @@ func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *use
 		CreatedAt: timestamppb.New(creditCard.CreatedAt)}, nil
 }
 
+func (fu *creditCardServer) CreateCreditCardApplication(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+
+	creditCardApplication := models.CreditCardApplication{
+		FirstName:            in.GetFirstName(),
+		LastName:             in.GetLastName(),
+		DateOfBirth:          in.GetDateOfBirth().AsTime(),
+		PhoneNumber:          in.GetPhoneNumber(),
+		SocialSecurityNumber: in.GetSocialSecurityNumber(),
+		EmploymentType:       in.GetEmploymentType(),
+		Occupation:           in.GetOccupation(),
+		MonthlyIncome:        float64(in.GetMonthlyIncome()),
+		YearsEmployed:        int(in.GetYearsEmployed()),
+		StreetAddress:        in.GetStreetAddress(),
+		YearsAtAddress:       int(in.GetYearsAtAddress()),
+		City:                 in.GetCity(),
+		State:                in.GetState(),
+		Zip:                  in.GetZip(),
+		Country:              in.GetCountry(),
+		Ownership:            in.GetOwnership(),
+		MonthlyPayment:       float64(in.GetMonthlyPayment()),
+		CardName:             in.GetCardName(),
+		CardType:             in.GetCardType(),
+		Branch:               in.GetBranch(),
+		CardBranding:         in.GetCardBranding(),
+	}
+
+	database.NewRecord(creditCardApplication)
+	database.Create(&creditCardApplication)
+
+	return &userpb.CreditCardApplication{
+		Id:                   uint32(creditCardApplication.ID),
+		FirstName:            creditCardApplication.FirstName,
+		LastName:             creditCardApplication.LastName,
+		DateOfBirth:          timestamppb.New(creditCardApplication.DateOfBirth),
+		PhoneNumber:          creditCardApplication.PhoneNumber,
+		SocialSecurityNumber: creditCardApplication.SocialSecurityNumber,
+		EmploymentType:       creditCardApplication.EmploymentType,
+		Occupation:           creditCardApplication.Occupation,
+		MonthlyIncome:        float32(creditCardApplication.MonthlyIncome),
+		YearsEmployed:        int32(creditCardApplication.YearsEmployed),
+		StreetAddress:        creditCardApplication.StreetAddress,
+		YearsAtAddress:       int32(creditCardApplication.YearsAtAddress),
+		City:                 creditCardApplication.City,
+		State:                creditCardApplication.State,
+		Zip:                  creditCardApplication.Zip,
+		Country:              creditCardApplication.Country,
+		Ownership:            creditCardApplication.Ownership,
+		MonthlyPayment:       float32(creditCardApplication.MonthlyPayment),
+		CardName:             creditCardApplication.CardName,
+		CardType:             creditCardApplication.CardType,
+		Branch:               creditCardApplication.Branch,
+		CardBranding:         creditCardApplication.CardBranding,
+		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
+		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
+		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
+func (fu *creditCardServer) GetCreditCardApplicationByName(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+
+	firstName := in.GetFirstName()
+	var creditCardApplication models.CreditCardApplication
+	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).Order("created_at desc").First(&creditCardApplication)
+
+	return &userpb.CreditCardApplication{
+		Id:                   uint32(creditCardApplication.ID),
+		FirstName:            creditCardApplication.FirstName,
+		LastName:             creditCardApplication.LastName,
+		DateOfBirth:          timestamppb.New(creditCardApplication.DateOfBirth),
+		PhoneNumber:          creditCardApplication.PhoneNumber,
+		SocialSecurityNumber: creditCardApplication.SocialSecurityNumber,
+		EmploymentType:       creditCardApplication.EmploymentType,
+		Occupation:           creditCardApplication.Occupation,
+		MonthlyIncome:        float32(creditCardApplication.MonthlyIncome),
+		YearsEmployed:        int32(creditCardApplication.YearsEmployed),
+		StreetAddress:        creditCardApplication.StreetAddress,
+		YearsAtAddress:       int32(creditCardApplication.YearsAtAddress),
+		City:                 creditCardApplication.City,
+		State:                creditCardApplication.State,
+		Zip:                  creditCardApplication.Zip,
+		Country:              creditCardApplication.Country,
+		Ownership:            creditCardApplication.Ownership,
+		MonthlyPayment:       float32(creditCardApplication.MonthlyPayment),
+		CardName:             creditCardApplication.CardName,
+		CardType:             creditCardApplication.CardType,
+		Branch:               creditCardApplication.Branch,
+		CardBranding:         creditCardApplication.CardBranding,
+		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
+		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
+		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
 func main() {
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
