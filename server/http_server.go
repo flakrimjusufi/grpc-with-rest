@@ -11,11 +11,14 @@ import (
 )
 
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	var database = db.Connect().Debug()
 
 	var users []models.User
-	database.Limit(100000).Find(&users)
+	database.Limit(100).Find(&users)
 	database.Close()
 
 	json.NewEncoder(w).Encode(users)
@@ -128,7 +131,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/user/updateById/{id}", updateUserById).Methods("POST")
 	myRouter.HandleFunc("/user/updateByName/{name}", updateUserByName).Methods("POST")
 	myRouter.HandleFunc("/user/delete/{name}", deleteUser).Methods("POST")
-	myRouter.HandleFunc("/user/list", getAllUsers).Methods("GET")
+	myRouter.HandleFunc("/user/list", getAllUsers).Methods("GET", "OPTIONS")
 	myRouter.HandleFunc("/user/getByName/{name}", getUserByName).Methods("GET")
 	myRouter.HandleFunc("/user/getById/{id}", getUserById).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8088", myRouter))

@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	db "server/main.go/database"
 	models "server/main.go/models"
 	userpb "server/main.go/proto"
@@ -25,7 +27,7 @@ const (
 	colorYellow = "\033[33m"
 )
 
-var database = db.Connect()
+var database = db.Connect().Debug()
 
 type userServer struct {
 	userpb.UnimplementedUserServiceServer
@@ -33,6 +35,30 @@ type userServer struct {
 
 type creditCardServer struct {
 	userpb.UnimplementedCreditCardServiceServer
+}
+
+func allowedOrigin(origin string) bool {
+	if viper.GetString("cors") == "*" {
+		return true
+	}
+	if matched, _ := regexp.MatchString(viper.GetString("cors"), origin); matched {
+		return true
+	}
+	return false
+}
+
+func cors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if allowedOrigin(r.Header.Get("Origin")) {
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
+		}
+		if r.Method == "OPTIONS" {
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func (as *userServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
@@ -96,7 +122,7 @@ func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Where("deleted_at is null").Order("created_at desc").Find(&list)
+	database.Where("deleted_at is null").Order("created_at desc").Limit(100).Find(&list)
 	return &userpb.ListUser{
 		Users: list,
 	}, nil
@@ -181,6 +207,99 @@ func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *use
 		CreatedAt: timestamppb.New(creditCard.CreatedAt)}, nil
 }
 
+func (fu *creditCardServer) CreateCreditCardApplication(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+
+	creditCardApplication := models.CreditCardApplication{
+		FirstName:            in.GetFirstName(),
+		LastName:             in.GetLastName(),
+		DateOfBirth:          in.GetDateOfBirth().AsTime(),
+		PhoneNumber:          in.GetPhoneNumber(),
+		SocialSecurityNumber: in.GetSocialSecurityNumber(),
+		EmploymentType:       in.GetEmploymentType(),
+		Occupation:           in.GetOccupation(),
+		MonthlyIncome:        float64(in.GetMonthlyIncome()),
+		YearsEmployed:        int(in.GetYearsEmployed()),
+		StreetAddress:        in.GetStreetAddress(),
+		YearsAtAddress:       int(in.GetYearsAtAddress()),
+		City:                 in.GetCity(),
+		State:                in.GetState(),
+		Zip:                  in.GetZip(),
+		Country:              in.GetCountry(),
+		Ownership:            in.GetOwnership(),
+		MonthlyPayment:       float64(in.GetMonthlyPayment()),
+		CardName:             in.GetCardName(),
+		CardType:             in.GetCardType(),
+		Branch:               in.GetBranch(),
+		CardBranding:         in.GetCardBranding(),
+	}
+
+	database.NewRecord(creditCardApplication)
+	database.Create(&creditCardApplication)
+
+	return &userpb.CreditCardApplication{
+		Id:                   uint32(creditCardApplication.ID),
+		FirstName:            creditCardApplication.FirstName,
+		LastName:             creditCardApplication.LastName,
+		DateOfBirth:          timestamppb.New(creditCardApplication.DateOfBirth),
+		PhoneNumber:          creditCardApplication.PhoneNumber,
+		SocialSecurityNumber: creditCardApplication.SocialSecurityNumber,
+		EmploymentType:       creditCardApplication.EmploymentType,
+		Occupation:           creditCardApplication.Occupation,
+		MonthlyIncome:        float32(creditCardApplication.MonthlyIncome),
+		YearsEmployed:        int32(creditCardApplication.YearsEmployed),
+		StreetAddress:        creditCardApplication.StreetAddress,
+		YearsAtAddress:       int32(creditCardApplication.YearsAtAddress),
+		City:                 creditCardApplication.City,
+		State:                creditCardApplication.State,
+		Zip:                  creditCardApplication.Zip,
+		Country:              creditCardApplication.Country,
+		Ownership:            creditCardApplication.Ownership,
+		MonthlyPayment:       float32(creditCardApplication.MonthlyPayment),
+		CardName:             creditCardApplication.CardName,
+		CardType:             creditCardApplication.CardType,
+		Branch:               creditCardApplication.Branch,
+		CardBranding:         creditCardApplication.CardBranding,
+		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
+		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
+		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
+func (fu *creditCardServer) GetCreditCardApplicationByName(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+
+	firstName := in.GetFirstName()
+	var creditCardApplication models.CreditCardApplication
+	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).Order("created_at desc").First(&creditCardApplication)
+
+	return &userpb.CreditCardApplication{
+		Id:                   uint32(creditCardApplication.ID),
+		FirstName:            creditCardApplication.FirstName,
+		LastName:             creditCardApplication.LastName,
+		DateOfBirth:          timestamppb.New(creditCardApplication.DateOfBirth),
+		PhoneNumber:          creditCardApplication.PhoneNumber,
+		SocialSecurityNumber: creditCardApplication.SocialSecurityNumber,
+		EmploymentType:       creditCardApplication.EmploymentType,
+		Occupation:           creditCardApplication.Occupation,
+		MonthlyIncome:        float32(creditCardApplication.MonthlyIncome),
+		YearsEmployed:        int32(creditCardApplication.YearsEmployed),
+		StreetAddress:        creditCardApplication.StreetAddress,
+		YearsAtAddress:       int32(creditCardApplication.YearsAtAddress),
+		City:                 creditCardApplication.City,
+		State:                creditCardApplication.State,
+		Zip:                  creditCardApplication.Zip,
+		Country:              creditCardApplication.Country,
+		Ownership:            creditCardApplication.Ownership,
+		MonthlyPayment:       float32(creditCardApplication.MonthlyPayment),
+		CardName:             creditCardApplication.CardName,
+		CardType:             creditCardApplication.CardType,
+		Branch:               creditCardApplication.Branch,
+		CardBranding:         creditCardApplication.CardBranding,
+		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
+		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
+		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
 func main() {
 	// Create a listener on TCP port
 	lis, err := net.Listen("tcp", ":8080")
@@ -227,7 +346,7 @@ func main() {
 
 	gwServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("server_port")),
-		Handler: gwmux,
+		Handler: cors(gwmux),
 	}
 
 	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("server_host"), os.Getenv("server_port")))
