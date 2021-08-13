@@ -145,7 +145,7 @@ and with this form we are sending a POST request [http://localhost:8090/card/cre
 
 ### To run the multi-step form, cd to ui directory and execute the following command:
 
-#### `yarn start`
+#### `yarn start` or `npm install` 
 
 ~~~
 Installs all the dependencies and runs the app in the development mode.
