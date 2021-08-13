@@ -143,12 +143,12 @@ grpc-with-rest provides a User-interface to create a credit card application.
 User-interface is a multi-step react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
 and with this form we are sending a POST request [http://localhost:8090/card/createCreditCardApplication] to the server.
 
-### To run the multi-step form, under the ui directory, you can run:
+### To run the multi-step form, cd to ui directory and execute the following command:
 
 #### `yarn start`
 
 ~~~
-Runs the app in the development mode.
+Installs all the dependencies and runs the app in the development mode.
 ~~~
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
