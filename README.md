@@ -159,5 +159,5 @@ Note that in order to interact with the server, you should also start up the gRP
 
 ### Multi-Step form:
 
-![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/multi-step-form.png)
+![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/multi-step-form.png)
 
