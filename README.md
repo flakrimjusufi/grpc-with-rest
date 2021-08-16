@@ -156,3 +156,8 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 Note that in order to interact with the server, you should also start up the gRPC server once the UI is up and running:
 
 `go run server/main.go`
+
+### Multi-Step form:
+
+![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/multi-step-form.png)
+
