@@ -6,6 +6,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
@@ -18,10 +20,7 @@ import (
 )
 
 const (
-	address     = "localhost:8080"
-	colorRed    = "\033[31m"
 	colorGreen  = "\033[32m"
-	colorWhite  = "\033[37m"
 	colorPurple = "\033[35m"
 	colorBlue   = "\033[34m"
 	colorYellow = "\033[33m"
@@ -77,6 +76,9 @@ func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.
 func (as *userServer) UpdateUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 
 	name := in.GetName()
+	if name == "" {
+		return &userpb.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
+	}
 	email := in.GetEmail()
 	phoneNumber := in.GetPhoneNumber()
 
@@ -112,8 +114,15 @@ func (as *userServer) UpdateUserById(ctx context.Context, in *userpb.User) (*use
 
 func (as *userServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
 	name := in.GetName()
+	if name == "" {
+		return &userpb.Message{}, status.Error(codes.InvalidArgument, "User's name not specified")
+	}
 	var user models.User
-	database.Where("name =?", name).Find(&user)
+	rowsAffected := database.Where("name =?", name).Find(&user).RowsAffected
+
+	if rowsAffected == 0 {
+		return &userpb.Message{}, status.Error(codes.NotFound, "Cannot find a User with this name!")
+	}
 	database.Delete(&user)
 
 	return &userpb.Message{Message: user.Name + " Deleted successfully!"}, nil
@@ -137,6 +146,9 @@ func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
 		"_______________________________________________________________________________________________________")
 	name := in.GetName()
+	if name == "" {
+		return &userpb.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
+	}
 	var user models.User
 	database.Where(&models.User{Name: name}).Find(&user)
 
@@ -146,7 +158,11 @@ func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	id := in.GetId()
 	var user models.User
-	database.Where("id = ?", id).Find(&user)
+	rowsAffected := database.Where("id = ?", id).Find(&user).RowsAffected
+
+	if rowsAffected == 0 {
+		return &userpb.User{}, status.Error(codes.NotFound, "Cannot find a User with this id!")
+	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -197,8 +213,15 @@ func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *use
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	name := in.GetName()
+	if name == "" {
+		return &userpb.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
+	}
 	var creditCard models.CreditCards
-	database.Where(&models.CreditCards{Name: name}).Find(&creditCard)
+	rowsAffected := database.Where(&models.CreditCards{Name: name}).Find(&creditCard).RowsAffected
+
+	if rowsAffected == 0 {
+		return &userpb.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
+	}
 
 	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen, "Now sending the response (credit card of selected user) to client side...")
 
