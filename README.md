@@ -157,10 +157,6 @@ Note that in order to interact with the server, you should also start up the gRP
 
 `go run server/main.go`
 
-### Multi-Step form:
+### Multi-Step form Demo:
 
-![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/multi-step-form.png)
-
-### Demo:
-
-![](https://youtu.be/gIiTUbvQRzw)
+![(https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/multi-step-form.png)](https://youtu.be/gIiTUbvQRzw)
