@@ -162,4 +162,4 @@ Note that in order to interact with the server, you should also start up the gRP
 ![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/multi-step-form.png)
 
 
-[**DEMO**](https://youtu.be/gIiTUbvQRzw)
+[![DEMO](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/demo-screen-shoot.png)](https://youtu.be/gIiTUbvQRzw)
