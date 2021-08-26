@@ -78,6 +78,17 @@ service CreditCardService{
       get: "/card/findByUserName/{name}"
     };
   }
+  rpc CreateCreditCardApplication (CreditCardApplication) returns (CreditCardApplication) {
+    option (google.api.http) = {
+      post: "/card/createCreditCardApplication"
+      body: "*"
+    };
+  }
+  rpc GetCreditCardApplicationByName (CreditCardApplication) returns (CreditCardApplication) {
+    option (google.api.http) = {
+      get: "/card/getCreditCardApplication/{firstName}"
+    };
+  }
 }
 
 message User {
@@ -108,6 +119,34 @@ message CreditCard {
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
   google.protobuf.Timestamp deleted_at = 12;
+}
+
+message CreditCardApplication {
+  uint32 id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  google.protobuf.Timestamp dateOfBirth = 4;
+  string phoneNumber = 5;
+  string socialSecurityNumber = 6;
+  string employmentType = 7;
+  string occupation = 8;
+  float monthlyIncome = 9;
+  int32 yearsEmployed = 10;
+  string streetAddress = 11;
+  int32 yearsAtAddress = 12;
+  string city = 13;
+  string state = 14;
+  string zip = 15;
+  string country = 16;
+  string ownership = 17;
+  float monthlyPayment = 18;
+  string cardName = 19;
+  string cardType = 20;
+  string branch = 21;
+  string cardBranding = 22;
+  google.protobuf.Timestamp created_at = 23;
+  google.protobuf.Timestamp updated_at = 24;
+  google.protobuf.Timestamp deleted_at = 25;
 }
 
 message ListCreditCards {
