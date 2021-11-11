@@ -13,6 +13,48 @@ Basically, what this app does is described in the picture below:
 
 ![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/architecture_introduction_diagram.jpg)
 
+## How to Run it?
+
+**Clone the repo in your local environment:**
+
+~~~~
+git clone https://github.com/flakrimjusufi/grpc-with-rest.git
+~~~~
+
+*Remove ".example" from both .env.example and /seeds/init.sql.example and populate them with your environment variables.*
+
+
+**In case you have docker-compose installed in your machine, just execute the following:**
+
+~~~~
+docker-compose up
+~~~~
+
+Docker-compose will build all the dependencies and will add a PostgreSQL image in your container alongside
+with the server so that we can interact with data.
+
+*Once the docker-compose is finished, you should see an output in terminal:*
+
+~~~
+Serving gRPC on localhost:8080
+Serving gRPC-Gateway on localhost:8090
+~~~
+
+*Send a POST request using cURL:*
+
+`curl -X POST -k http://localhost:8090/v1/example/echo -d '{"name": "Flakrim"}'`
+
+~~~~
+You should have a response from server: 
+
+{
+  "message": "Hello Flakrim"
+}
+~~~~
+
+
+## In case you don't have docker installed, you need to do the following:
+
 ## Pre-requisites
 
 ### 1. Go
@@ -40,14 +82,28 @@ git clone https://github.com/flakrimjusufi/grpc-with-rest.git
 **2. Populate environment variables in .env file:**
 
 ~~~~
-db_name = (PostgreSQL database name, for example: testdb)
-db_pass = (PostgreSQL database password, for example: 123456)
-db_user = (PostgreSQL database user, for example: testuser)
-db_type = (PostgreSQL database type, for example: postgres)
-db_host = (PostgreSQL database host, for example: localhost)
-db_port = (PostgreSQL database port, for example: 5434)
-server_host = (The server in which you will run the app, for example: 0.0.0.0)
-server_port = (The port in which you will run the server, for example: :8090) 
+DB_USERNAME=
+DB_DATABASE=
+DB_HOSTNAME=
+DB_PORT=
+DB_TYPE=
+POSTGRES_PASSWORD=
+SERVER_HOST=
+GRPC_SERVER_PORT=
+GRPC_GATEWAY_SERVER_PORT=
+~~~~
+
+**.env file example**
+~~~~
+DB_USERNAME = (PostgreSQL database user, for example: testuser)
+DB_DATABASE = (PostgreSQL database name, for example: testdb)
+DB_HOSTNAME = (PostgreSQL database host, for example: localhost)
+DB_TYPE = (PostgreSQL database type, for example: postgres)
+DB_PORT = (PostgreSQL database port, for example: 5434)
+POSTGRES_PASSWORD = (PostgreSQL database password, for example: 123456)
+SERVER_HOST = (The server in which you will run the app, for example: 0.0.0.0)
+GRPC_SERVER_PORT = (The port in which you will run the app, for example: 8080
+GRPC_GATEWAY_SERVER_PORT = (The port in which you will run the server, for example: 8090) 
 ~~~~
 
 **3. Run the server first:**

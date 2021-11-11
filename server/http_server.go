@@ -10,50 +10,41 @@ import (
 	"server/main.go/models"
 )
 
+var database = db.Connect().Debug()
+
 func getAllUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	var database = db.Connect().Debug()
 
 	var users []models.User
 	database.Limit(100).Find(&users)
-	database.Close()
 
 	json.NewEncoder(w).Encode(users)
 }
 
 func getUserByName(w http.ResponseWriter, r *http.Request) {
 
-	var database = db.Connect().Debug()
-
 	vars := mux.Vars(r)
 	name := vars["name"]
 	var user models.User
 	database.Where(&models.User{Name: name}).Find(&user)
-	database.Close()
 
 	json.NewEncoder(w).Encode(user)
 }
 
 func getUserById(w http.ResponseWriter, r *http.Request) {
 
-	var database = db.Connect().Debug()
-
 	vars := mux.Vars(r)
 	idFromMux := vars["id"]
 
 	var user models.User
 	database.Where("id = ?", idFromMux).Find(&user)
-	database.Close()
-
 	json.NewEncoder(w).Encode(user)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-
-	var database = db.Connect().Debug()
 
 	user := models.User{}
 
@@ -64,14 +55,10 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	database.NewRecord(user)
 	database.Create(&user)
-	database.Close()
-
 	json.NewEncoder(w).Encode(user)
 }
 
 func updateUserById(w http.ResponseWriter, r *http.Request) {
-
-	var database = db.Connect().Debug()
 
 	user := models.User{}
 	vars := mux.Vars(r)
@@ -85,13 +72,9 @@ func updateUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	database.Save(&user)
-	database.Close()
-
 	json.NewEncoder(w).Encode(user)
 }
 func updateUserByName(w http.ResponseWriter, r *http.Request) {
-
-	var database = db.Connect().Debug()
 
 	user := models.User{}
 	vars := mux.Vars(r)
@@ -105,14 +88,10 @@ func updateUserByName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	database.Save(&user)
-	database.Close()
-
 	json.NewEncoder(w).Encode(user)
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
-
-	var database = db.Connect().Debug()
 
 	user := models.User{}
 	vars := mux.Vars(r)
@@ -120,7 +99,6 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	database.Where("name =?", name).Find(&user)
 	database.Delete(&user)
-	database.Close()
 
 	json.NewEncoder(w).Encode("User deleted successfully")
 }

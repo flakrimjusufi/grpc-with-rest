@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -324,8 +325,15 @@ func (fu *creditCardServer) GetCreditCardApplicationByName(ctx context.Context, 
 }
 
 func main() {
+
+	if os.Getenv("GRPC_SERVER_PORT") == "" {
+		e := godotenv.Load() //Load .env file for local environment
+		if e != nil {
+			fmt.Println(e)
+		}
+	}
 	// Create a listener on TCP port
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("GRPC_SERVER_PORT")))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
@@ -337,7 +345,7 @@ func main() {
 	userpb.RegisterCreditCardServiceServer(s, &creditCardServer{})
 
 	// Serve gRPC server
-	log.Println("Serving gRPC on 0.0.0.0:8080")
+	log.Println(fmt.Sprintf("Serving gRPC on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT")))
 	go func() {
 		log.Fatalln(s.Serve(lis))
 	}()
@@ -347,7 +355,7 @@ func main() {
 	// This is where the gRPC-Gateway proxies the requests
 	conn, err := grpc.DialContext(
 		context.Background(),
-		"0.0.0.0:8080",
+		fmt.Sprintf("%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT")),
 		grpc.WithBlock(),
 		grpc.WithInsecure(),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize), grpc.MaxCallSendMsgSize(maxMsgSize)),
@@ -368,10 +376,10 @@ func main() {
 	}
 
 	gwServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", os.Getenv("server_port")),
+		Addr:    fmt.Sprintf(":%s", os.Getenv("GRPC_GATEWAY_SERVER_PORT")),
 		Handler: cors(gwmux),
 	}
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("server_host"), os.Getenv("server_port")))
+	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_GATEWAY_SERVER_PORT")))
 	log.Fatalln(gwServer.ListenAndServe())
 }
