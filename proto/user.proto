@@ -65,6 +65,19 @@ service UserService {
       body: "*"
     };
   }
+  rpc CreatePayload (Payload) returns (Payload) {
+    option (google.api.http) = {
+      post: "/v1/payload"
+      body: "*"
+    };
+  }
+
+  rpc PostPayload (AnyPayload) returns (Result) {
+    option (google.api.http) = {
+      post: "/v1/postPayload"
+      body: "*"
+    };
+  }
 }
 
 service CreditCardService{
@@ -100,6 +113,21 @@ message User {
 
 message Message {
   string message = 1;
+}
+
+message Payload {
+  message Attributes {
+    map<string, string> values = 1;
+  }
+  repeated Attributes attributes = 1;
+}
+
+message Result {
+  map<string, string> result = 1;
+}
+
+message AnyPayload {
+  string body = 1;
 }
 
 message ListUser {
