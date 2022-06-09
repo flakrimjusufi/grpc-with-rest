@@ -50,3 +50,22 @@ func UpdateUserById(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+func UpdateUserByName(c echo.Context) error {
+
+	user := models.User{}
+	name := c.Param("name")
+
+	query := database.Where("name =?", name).Find(&user)
+
+	if query != nil {
+		return c.JSON(http.StatusInternalServerError, query.Error)
+	}
+
+	result := database.Save(&user)
+	if result != nil {
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	}
+
+	return c.JSON(http.StatusOK, user)
+}

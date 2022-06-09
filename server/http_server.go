@@ -79,7 +79,6 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/user/updateByName/{name}", updateUserByName).Methods("POST")
 	myRouter.HandleFunc("/user/delete/{name}", deleteUser).Methods("POST")
 	myRouter.HandleFunc("/user/list", getAllUsers).Methods("GET", "OPTIONS")
 	myRouter.HandleFunc("/user/getByName/{name}", getUserByName).Methods("GET")
@@ -103,5 +102,6 @@ func main() {
 
 	e.POST("/user", controllers.CreateUser)
 	e.PUT("/user/:id", controllers.UpdateUserById)
+	e.PUT("/user/:name", controllers.UpdateUserByName)
 
 }
