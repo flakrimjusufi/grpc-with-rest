@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"os"
-	"server/main.go/controllers"
+	"server/main.go/handlers"
 )
 
 func main() {
@@ -22,12 +22,12 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 
-	e.GET("/user/", controllers.GetAllUsers)
-	e.GET("/user/:name", controllers.GetUserByName)
-	e.GET("/user/:id", controllers.GetUserById)
-	e.POST("/user", controllers.CreateUser)
-	e.PUT("/user/:id", controllers.UpdateUserById)
-	e.PUT("/user/:name", controllers.UpdateUserByName)
-	e.DELETE("/user/:name", controllers.DeleteUserByName)
+	e.GET("/user/", handlers.GetAllUsers)
+	e.GET("/user/:name", handlers.GetUserByName)
+	e.GET("/user/:id", handlers.GetUserById)
+	e.POST("/user", handlers.CreateUser)
+	e.PUT("/user/:id", handlers.UpdateUserById)
+	e.PUT("/user/:name", handlers.UpdateUserByName)
+	e.DELETE("/user/:name", handlers.DeleteUserByName)
 
 }
