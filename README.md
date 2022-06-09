@@ -179,18 +179,19 @@ There are three data models which we are using in this app:
 After populating the database, you can use the below es to hit the reverse proxy server and to get the data from the
 server:
 
-| HTTP call        | Endpoint           | Description  |
-| :-------------: |:-------------:| :-----:|
-| POST     | http://localhost:8090/user/create | Will create a user in database |
-| GET      | http://localhost:8090/user/findByName/Flakrim      |  Will find a user by name in database |
-| GET | http://localhost:8090/user/findById/120023      |   Will find a user by Id in database |
-| GET | http://localhost:8090/user/list     |   Will find all the user in database |
-| POST | http://localhost:8090/user/updateById/12003     |   Will update a user by Id in database |
-| POST | http://localhost:8090/user/delete     |   Will delete a user by name in database |
-| GET | http://localhost:8090/card/listCreditCards     |   Will list all credit cards in database |
-| GET | http://localhost:8090/card/findByUserName/Flakrim     |   Will find a credit card by user name in database |
-| POST | http://localhost:8090/card/createCreditCardApplication | Will create a credit card application |
-| GET | http://localhost:8090/card/getCreditCardApplication/Flakrim | Will find a credit card application by user first name |
+| HTTP call |                          Endpoint                           |                      Description                       |
+|:---------:|:-----------------------------------------------------------:|:------------------------------------------------------:|
+|   POST    |                 http://localhost:8090/user                  |             Will create a user in database             |
+|    GET    |              http://localhost:8090/user/:name               |          Will find a user by name in database          |
+|    GET    |               http://localhost:8090/user/:id                |           Will find a user by Id in database           |
+|    GET    |                 http://localhost:8090/user                  |           Will find all the user in database           |
+|    PUT    |               http://localhost:8090/user/:id                |          Will update a user by Id in database          |
+|    PUT    |              http://localhost:8090/user/:name               |         Will update a user by name in database         |
+|  DELETE   |              http://localhost:8090/user/:name               |         Will delete a user by name in database         |
+|    GET    |         http://localhost:8090/card/listCreditCards          |         Will list all credit cards in database         |
+|    GET    |      http://localhost:8090/card/findByUserName/Flakrim      |    Will find a credit card by user name in database    |
+|   POST    |   http://localhost:8090/card/createCreditCardApplication    |         Will create a credit card application          |
+|    GET    | http://localhost:8090/card/getCreditCardApplication/Flakrim | Will find a credit card application by user first name |
 
 ## User Interface
 
