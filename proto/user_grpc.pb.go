@@ -28,6 +28,8 @@ type UserServiceClient interface {
 	SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
 	FindUserFromGetUserByIdRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	FindUserFromGetUserByNameRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
+	CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error)
+	PostPayload(ctx context.Context, in *AnyPayload, opts ...grpc.CallOption) (*Result, error)
 }
 
 type userServiceClient struct {
@@ -128,6 +130,24 @@ func (c *userServiceClient) FindUserFromGetUserByNameRPC(ctx context.Context, in
 	return out, nil
 }
 
+func (c *userServiceClient) CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error) {
+	out := new(Payload)
+	err := c.cc.Invoke(ctx, "/helloworld.UserService/CreatePayload", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) PostPayload(ctx context.Context, in *AnyPayload, opts ...grpc.CallOption) (*Result, error) {
+	out := new(Result)
+	err := c.cc.Invoke(ctx, "/helloworld.UserService/PostPayload", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -142,6 +162,8 @@ type UserServiceServer interface {
 	SayHello(context.Context, *User) (*Message, error)
 	FindUserFromGetUserByIdRPC(context.Context, *User) (*User, error)
 	FindUserFromGetUserByNameRPC(context.Context, *User) (*User, error)
+	CreatePayload(context.Context, *Payload) (*Payload, error)
+	PostPayload(context.Context, *AnyPayload) (*Result, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -178,6 +200,12 @@ func (UnimplementedUserServiceServer) FindUserFromGetUserByIdRPC(context.Context
 }
 func (UnimplementedUserServiceServer) FindUserFromGetUserByNameRPC(context.Context, *User) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindUserFromGetUserByNameRPC not implemented")
+}
+func (UnimplementedUserServiceServer) CreatePayload(context.Context, *Payload) (*Payload, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePayload not implemented")
+}
+func (UnimplementedUserServiceServer) PostPayload(context.Context, *AnyPayload) (*Result, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostPayload not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -372,6 +400,42 @@ func _UserService_FindUserFromGetUserByNameRPC_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CreatePayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Payload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreatePayload(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helloworld.UserService/CreatePayload",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreatePayload(ctx, req.(*Payload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_PostPayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AnyPayload)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).PostPayload(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helloworld.UserService/PostPayload",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).PostPayload(ctx, req.(*AnyPayload))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +482,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindUserFromGetUserByNameRPC",
 			Handler:    _UserService_FindUserFromGetUserByNameRPC_Handler,
+		},
+		{
+			MethodName: "CreatePayload",
+			Handler:    _UserService_CreatePayload_Handler,
+		},
+		{
+			MethodName: "PostPayload",
+			Handler:    _UserService_PostPayload_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

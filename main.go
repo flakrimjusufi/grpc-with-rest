@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
@@ -9,11 +11,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"reflect"
 	"regexp"
 	db "server/main.go/database"
 	models "server/main.go/models"
@@ -63,6 +67,59 @@ func cors(h http.Handler) http.Handler {
 
 func (as *userServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
 	return &userpb.Message{Message: "Hello " + in.Name}, nil
+}
+
+func (as *userServer) CreatePayload(ctx context.Context, in *userpb.Payload) (*userpb.Payload, error) {
+
+	list := make([]interface{}, 0)
+
+	for _, attributes := range in.GetAttributes() {
+		count := 1
+		for key, value := range attributes.GetValues() {
+			message := map[string]interface{}{
+				"type":     reflect.ValueOf(value).Kind(),
+				"key":      key,
+				"value":    value,
+				"position": count,
+			}
+			log.Printf("%v %v = %d", reflect.TypeOf(value), key, count)
+			count += 1
+			list = append(list, message)
+		}
+		jsonBytes, _ := protojson.Marshal(&userpb.Payload_Attributes{Values: attributes.GetValues()})
+		fmt.Println(string(jsonBytes))
+	}
+
+	return &userpb.Payload{Attributes: in.GetAttributes()}, nil
+}
+
+func (as *userServer) PostPayload(ctx context.Context, in *userpb.AnyPayload) (*userpb.Result, error) {
+
+	rawDecodedText, err := base64.StdEncoding.DecodeString(in.GetBody())
+	if err != nil {
+		panic(err)
+	}
+	var result = map[string]interface{}{}
+	rawError := json.Unmarshal(rawDecodedText, &result)
+
+	if rawError != nil {
+		panic(rawError)
+	}
+	log.Println(Prettify(result))
+
+	mapString := make(map[string]string)
+	for key, value := range result {
+		strKey := fmt.Sprintf("%v", key)
+		strValue := fmt.Sprintf("%v", value)
+		mapString[strKey] = strValue
+	}
+
+	return &userpb.Result{Result: mapString}, nil
+}
+
+func Prettify(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
 
 func (as *userServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
