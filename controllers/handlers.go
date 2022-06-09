@@ -69,3 +69,22 @@ func UpdateUserByName(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+func DeleteUserByName(c echo.Context) error {
+
+	user := models.User{}
+	name := c.Param("name")
+
+	query := database.Where("name =?", name).Find(&user)
+
+	if query != nil {
+		return c.JSON(http.StatusInternalServerError, query.Error)
+	}
+
+	result := database.Delete(&user)
+	if result != nil {
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	}
+
+	return c.JSON(http.StatusOK, result.RowsAffected)
+}
