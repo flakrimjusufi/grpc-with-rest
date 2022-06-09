@@ -101,6 +101,7 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 
-	e.POST("/user/create", controllers.CreateUser)
+	e.POST("/user", controllers.CreateUser)
+	e.PUT("/user/:id", controllers.UpdateUserById)
 
 }
