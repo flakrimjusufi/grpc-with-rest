@@ -2,10 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
+	"os"
+	"server/main.go/controllers"
 	db "server/main.go/database"
 	"server/main.go/models"
 )
@@ -44,36 +48,6 @@ func getUserById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func createUser(w http.ResponseWriter, r *http.Request) {
-
-	user := models.User{}
-
-	err := json.NewDecoder(r.Body).Decode(&user) //decode the request body into struct and failed if any error occur
-	if err != nil {
-		panic(err)
-	}
-
-	database.NewRecord(user)
-	database.Create(&user)
-	json.NewEncoder(w).Encode(user)
-}
-
-func updateUserById(w http.ResponseWriter, r *http.Request) {
-
-	user := models.User{}
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	database.Where("id =?", id).Find(&user)
-
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		panic(err)
-	}
-
-	database.Save(&user)
-	json.NewEncoder(w).Encode(user)
-}
 func updateUserByName(w http.ResponseWriter, r *http.Request) {
 
 	user := models.User{}
@@ -105,8 +79,6 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/user/create", createUser).Methods("POST")
-	myRouter.HandleFunc("/user/updateById/{id}", updateUserById).Methods("POST")
 	myRouter.HandleFunc("/user/updateByName/{name}", updateUserByName).Methods("POST")
 	myRouter.HandleFunc("/user/delete/{name}", deleteUser).Methods("POST")
 	myRouter.HandleFunc("/user/list", getAllUsers).Methods("GET", "OPTIONS")
@@ -116,7 +88,19 @@ func handleRequests() {
 }
 
 func main() {
-	fmt.Println("Starting server in localhost:8088")
-	handleRequests()
+
+	// Echo instance
+	e := echo.New()
+	if os.Getenv("SERVER_PORT") == "" {
+		err := godotenv.Load() //Load .env file for local environment
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	// Middleware
+	e.Use(middleware.Logger())
+
+	e.POST("/user/create", controllers.CreateUser)
 
 }
