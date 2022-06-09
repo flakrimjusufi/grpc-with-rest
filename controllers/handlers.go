@@ -100,3 +100,23 @@ func GetAllUsers(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, users)
 }
+
+func GetUserByName(c echo.Context) error {
+
+	user := models.User{}
+	name := c.Param("name")
+
+	query := database.Where("name =?", name).Find(&user)
+
+	if query != nil {
+		return c.JSON(http.StatusInternalServerError, query.Error)
+	}
+
+	result := database.Where(&models.User{Name: name}).Find(&user)
+
+	if result != nil {
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
