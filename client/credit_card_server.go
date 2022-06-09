@@ -36,7 +36,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	personName := "Tom Muller"
+	personName := "Flakrim"
 
 	log.Println(colorRed, "Starting the server on client side...")
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
@@ -64,7 +64,8 @@ func main() {
 		"_______________________________________________________________________________________________________")
 	log.Println(
 		colorWhite,
-		"Now sending the retrieved data to [CreditCardService] in order interact with rpc call [GetCreditCardByUserName] and to receive person's credit card information")
+		"Now sending the retrieved data to [CreditCardService] in order interact with rpc call "+
+			"[GetCreditCardByUserName] and to receive person's credit card information")
 
 	//credit card client
 	ctx2, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -75,7 +76,7 @@ func main() {
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
 		"_______________________________________________________________________________________________________")
 	if err != nil {
-		log.Fatalf("could not get person data: %v", err)
+		log.Fatalf("could not get any data: %v", err)
 	}
 	log.Println(
 		colorPurple,
