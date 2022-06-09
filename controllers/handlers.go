@@ -120,3 +120,20 @@ func GetUserByName(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+func GetUserById(c echo.Context) error {
+
+	user := models.User{}
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	query := database.Where("id =?", userId).Find(&user)
+
+	if query != nil {
+		return c.JSON(http.StatusInternalServerError, query.Error)
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
