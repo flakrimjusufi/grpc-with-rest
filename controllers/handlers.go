@@ -88,3 +88,15 @@ func DeleteUserByName(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result.RowsAffected)
 }
+
+func GetAllUsers(c echo.Context) error {
+
+	var users []models.User
+	query := database.Limit(100).Find(&users)
+
+	if query != nil {
+		return c.JSON(http.StatusInternalServerError, query.Error)
+	}
+
+	return c.JSON(http.StatusOK, users)
+}

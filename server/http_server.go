@@ -103,5 +103,6 @@ func main() {
 	e.PUT("/user/:id", controllers.UpdateUserById)
 	e.PUT("/user/:name", controllers.UpdateUserByName)
 	e.DELETE("/user/:name", controllers.DeleteUserByName)
+	e.GET("/user/", controllers.GetAllUsers)
 
 }
