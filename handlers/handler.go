@@ -12,7 +12,7 @@ var database = db.Connect().Debug()
 
 func CreateUser(c echo.Context) error {
 
-	user := models.User{}
+	user := new(models.User)
 
 	if err := c.Bind(user); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
@@ -38,13 +38,13 @@ func UpdateUserById(c echo.Context) error {
 
 	query := database.Where("id =?", userId).Find(&user)
 
-	if query != nil {
-		return c.JSON(http.StatusInternalServerError, query.Error)
+	if query.Error != nil {
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	result := database.Save(&user)
 
-	if result != nil {
+	if result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
@@ -58,12 +58,12 @@ func UpdateUserByName(c echo.Context) error {
 
 	query := database.Where("name =?", name).Find(&user)
 
-	if query != nil {
-		return c.JSON(http.StatusInternalServerError, query.Error)
+	if query.Error != nil {
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	result := database.Save(&user)
-	if result != nil {
+	if result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
@@ -72,21 +72,21 @@ func UpdateUserByName(c echo.Context) error {
 
 func DeleteUserByName(c echo.Context) error {
 
-	user := models.User{}
+	user := new(models.User)
 	name := c.Param("name")
 
 	query := database.Where("name =?", name).Find(&user)
 
-	if query != nil {
-		return c.JSON(http.StatusInternalServerError, query.Error)
+	if query.Error != nil {
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	result := database.Delete(&user)
-	if result != nil {
+	if result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
-	return c.JSON(http.StatusOK, result.RowsAffected)
+	return c.JSON(http.StatusNoContent, result.RowsAffected)
 }
 
 func GetAllUsers(c echo.Context) error {
@@ -94,7 +94,7 @@ func GetAllUsers(c echo.Context) error {
 	var users []models.User
 	query := database.Limit(100).Find(&users)
 
-	if query != nil {
+	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, query.Error)
 	}
 
@@ -108,13 +108,13 @@ func GetUserByName(c echo.Context) error {
 
 	query := database.Where("name =?", name).Find(&user)
 
-	if query != nil {
+	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, query.Error)
 	}
 
 	result := database.Where(&models.User{Name: name}).Find(&user)
 
-	if result != nil {
+	if result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
@@ -131,7 +131,7 @@ func GetUserById(c echo.Context) error {
 
 	query := database.Where("id =?", userId).Find(&user)
 
-	if query != nil {
+	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, query.Error)
 	}
 

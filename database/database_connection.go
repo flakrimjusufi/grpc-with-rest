@@ -5,21 +5,16 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 	"server/main.go/models"
 	"time"
-)
-
-const (
-	colorRed = "\033[31m"
 )
 
 func Connect() *gorm.DB {
 	if os.Getenv("DB_USERNAME") == "" {
 		e := godotenv.Load() //Load .env file for local environment
 		if e != nil {
-			fmt.Print(e)
+			panic(e)
 		}
 	}
 	username := os.Getenv("DB_USERNAME")
@@ -28,11 +23,8 @@ func Connect() *gorm.DB {
 	dbHost := os.Getenv("DB_HOSTNAME")
 	dbType := os.Getenv("DB_TYPE")
 
-	if dbHost == "" || dbName == "" || dbType == "" {
-		log.Println(colorRed, ".env file is empty. Please add the environment variables in .env file first and run the server again!")
-	}
-
-	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password) //Build connection string
+	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username,
+		dbName, password) // connection string
 
 	database, err := gorm.Open(dbType, dbUri)
 	if err != nil {
@@ -42,10 +34,10 @@ func Connect() *gorm.DB {
 	database.Debug().AutoMigrate(models.CreditCards{})
 	database.Debug().AutoMigrate(models.CreditCardApplication{})
 
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+	// SetMaxIdleConnections sets the maximum number of connections in the idle connection pool.
 	database.DB().SetMaxIdleConns(10)
 
-	// SetMaxOpenConns sets the maximum number of open connections to the database.
+	// SetMaxOpenConnections sets the maximum number of open connections to the database.
 	database.DB().SetMaxOpenConns(100)
 
 	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.

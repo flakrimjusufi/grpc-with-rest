@@ -181,13 +181,13 @@ server:
 
 | HTTP call |                          Endpoint                           |                      Description                       |
 |:---------:|:-----------------------------------------------------------:|:------------------------------------------------------:|
-|   POST    |                 http://localhost:8090/user                  |             Will create a user in database             |
-|    GET    |              http://localhost:8090/user/:name               |          Will find a user by name in database          |
-|    GET    |               http://localhost:8090/user/:id                |           Will find a user by Id in database           |
-|    GET    |                 http://localhost:8090/user                  |           Will find all the user in database           |
-|    PUT    |               http://localhost:8090/user/:id                |          Will update a user by Id in database          |
-|    PUT    |              http://localhost:8090/user/:name               |         Will update a user by name in database         |
-|  DELETE   |              http://localhost:8090/user/:name               |         Will delete a user by name in database         |
+|   POST    |              http://localhost:8090/api/v1/user              |             Will create a user in database             |
+|    GET    |           http://localhost:8090/api/v1/user/:name           |          Will find a user by name in database          |
+|    GET    |            http://localhost:8090/api/v1/user/:id            |           Will find a user by Id in database           |
+|    GET    |              http://localhost:8090/api/v1/user              |           Will find all the user in database           |
+|    PUT    |            http://localhost:8090/api/v1/user/:id            |          Will update a user by Id in database          |
+|    PUT    |           http://localhost:8090/api/v1/user/:name           |         Will update a user by name in database         |
+|  DELETE   |           http://localhost:8090/api/v1/user/:name           |         Will delete a user by name in database         |
 |    GET    |         http://localhost:8090/card/listCreditCards          |         Will list all credit cards in database         |
 |    GET    |      http://localhost:8090/card/findByUserName/Flakrim      |    Will find a credit card by user name in database    |
 |   POST    |   http://localhost:8090/card/createCreditCardApplication    |         Will create a credit card application          |

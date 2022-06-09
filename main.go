@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,8 +17,8 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"regexp"
 	db "server/main.go/database"
+	"server/main.go/helper"
 	models "server/main.go/models"
 	userpb "server/main.go/proto"
 )
@@ -41,22 +40,13 @@ type creditCardServer struct {
 	userpb.UnimplementedCreditCardServiceServer
 }
 
-func allowedOrigin(origin string) bool {
-	if viper.GetString("cors") == "*" {
-		return true
-	}
-	if matched, _ := regexp.MatchString(viper.GetString("cors"), origin); matched {
-		return true
-	}
-	return false
-}
-
 func cors(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if allowedOrigin(r.Header.Get("Origin")) {
+		if helper.AllowedOrigin(r.Header.Get("Origin")) {
 			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
+			w.Header().Set("Access-Control-Allow-Headers",
+				"Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
 		}
 		if r.Method == "OPTIONS" {
 			return
@@ -200,7 +190,8 @@ func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
 		"_______________________________________________________________________________________________________")
-	log.Println(colorPurple, "[userService] - [rpc GetUserByName] -> ", colorBlue, "Received person's name: ", in.GetName())
+	log.Println(colorPurple, "[userService] - [rpc GetUserByName] -> ",
+		colorBlue, "Received person's name: ", in.GetName())
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
 		"_______________________________________________________________________________________________________")
 	name := in.GetName()
@@ -229,14 +220,16 @@ func (as *userServer) FindUserFromGetUserByIdRPC(ctx context.Context, in *userpb
 
 	user, _ := as.GetUserById(ctx, in)
 
-	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(), PhoneNumber: user.GetPhoneNumber()}, nil
+	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(),
+		PhoneNumber: user.GetPhoneNumber()}, nil
 }
 
 func (as *userServer) FindUserFromGetUserByNameRPC(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 
 	user, _ := as.GetUserByName(ctx, in)
 
-	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(), PhoneNumber: user.GetPhoneNumber()}, nil
+	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(),
+		PhoneNumber: user.GetPhoneNumber()}, nil
 }
 
 func (fu *creditCardServer) CreditCards(ctx context.Context, in *userpb.CreditCard) (*userpb.ListCreditCards, error) {
@@ -267,7 +260,8 @@ func (fu *creditCardServer) CreditCards(ctx context.Context, in *userpb.CreditCa
 	}, nil
 }
 
-func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *userpb.CreditCard) (*userpb.CreditCard, error) {
+func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context,
+	in *userpb.CreditCard) (*userpb.CreditCard, error) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	name := in.GetName()
@@ -281,14 +275,17 @@ func (fu *creditCardServer) GetCreditCardByUserName(ctx context.Context, in *use
 		return &userpb.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
 	}
 
-	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen, "Now sending the response (credit card of selected user) to client side...")
+	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen,
+		"Now sending the response (credit card of selected user) to client side...")
 
-	return &userpb.CreditCard{Id: uint32(creditCard.ID), Name: creditCard.Name, Email: creditCard.Email, PhoneNumber: creditCard.PhoneNumber,
-		Address: creditCard.Address, Country: creditCard.Country, City: creditCard.City, Zip: creditCard.Zip, Cvv: creditCard.CVV,
+	return &userpb.CreditCard{Id: uint32(creditCard.ID), Name: creditCard.Name, Email: creditCard.Email,
+		PhoneNumber: creditCard.PhoneNumber, Address: creditCard.Address, Country: creditCard.Country,
+		City: creditCard.City, Zip: creditCard.Zip, Cvv: creditCard.CVV,
 		CreatedAt: timestamppb.New(creditCard.CreatedAt)}, nil
 }
 
-func (fu *creditCardServer) CreateCreditCardApplication(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+func (fu *creditCardServer) CreateCreditCardApplication(ctx context.Context,
+	in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
 
 	creditCardApplication := models.CreditCardApplication{
 		FirstName:            in.GetFirstName(),
@@ -346,11 +343,13 @@ func (fu *creditCardServer) CreateCreditCardApplication(ctx context.Context, in 
 	}, nil
 }
 
-func (fu *creditCardServer) GetCreditCardApplicationByName(ctx context.Context, in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
+func (fu *creditCardServer) GetCreditCardApplicationByName(ctx context.Context,
+	in *userpb.CreditCardApplication) (*userpb.CreditCardApplication, error) {
 
 	firstName := in.GetFirstName()
 	var creditCardApplication models.CreditCardApplication
-	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).Order("created_at desc").First(&creditCardApplication)
+	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
+		Order("created_at desc").First(&creditCardApplication)
 
 	return &userpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
@@ -437,6 +436,7 @@ func main() {
 		Handler: cors(gwmux),
 	}
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_GATEWAY_SERVER_PORT")))
+	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("SERVER_HOST"),
+		os.Getenv("GRPC_GATEWAY_SERVER_PORT")))
 	log.Fatalln(gwServer.ListenAndServe())
 }

@@ -21,6 +21,7 @@ func main() {
 
 	// Middleware
 	e.Use(middleware.Logger())
+	e.Group("api/v1")
 
 	e.GET("/user/", handlers.GetAllUsers)
 	e.GET("/user/:name", handlers.GetUserByName)
