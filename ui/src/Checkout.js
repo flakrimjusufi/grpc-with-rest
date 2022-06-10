@@ -205,7 +205,7 @@ export default function Checkout() {
       <AppBar position="absolute" color="default" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" color="inherit" noWrap>
-            United Community Bank
+            Community Bank
           </Typography>
         </Toolbar>
       </AppBar>
