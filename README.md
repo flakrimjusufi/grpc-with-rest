@@ -42,7 +42,7 @@ Serving gRPC-Gateway on localhost:8090
 
 *Send a POST request using cURL:*
 
-`curl -X POST -k http://localhost:8090/v1/example/echo -d '{"name": "Flakrim"}'`
+`curl -X POST -k http://localhost:8090/api/v1/example/echo -d '{"name": "Flakrim"}'`
 
 ~~~~
 You should have a response from server: 
@@ -64,7 +64,7 @@ You should have a response from server:
 For installation instructions, see Go's getting started guide: https://golang.org/doc/install
 ~~~~
 
-### 2. PostgreSQL (or any SQL database)
+### 2. PostgresSQL (or any SQL database)
 
 ~~~~
 [Version 9+]
@@ -118,7 +118,7 @@ Serving gRPC-Gateway on 0.0.0.0:8090
 
 **4. Send a POST request using cURL:**
 
-`curl -X POST -k http://localhost:8090/v1/example/echo -d '{"name": "Flakrim"}'`
+`curl -X POST -k http://localhost:8090/api/v1/example/echo -d '{"name": "Flakrim"}'`
 
 ~~~~
 You should have a response from server: 
@@ -179,28 +179,28 @@ There are three data models which we are using in this app:
 After populating the database, you can use the below es to hit the reverse proxy server and to get the data from the
 server:
 
-| HTTP call |                          Endpoint                           |                      Description                       |
-|:---------:|:-----------------------------------------------------------:|:------------------------------------------------------:|
-|   POST    |              http://localhost:8090/api/v1/user              |             Will create a user in database             |
-|    GET    |           http://localhost:8090/api/v1/user/:name           |          Will find a user by name in database          |
-|    GET    |            http://localhost:8090/api/v1/user/:id            |           Will find a user by Id in database           |
-|    GET    |              http://localhost:8090/api/v1/user              |           Will find all the user in database           |
-|    PUT    |            http://localhost:8090/api/v1/user/:id            |          Will update a user by Id in database          |
-|    PUT    |           http://localhost:8090/api/v1/user/:name           |         Will update a user by name in database         |
-|  DELETE   |           http://localhost:8090/api/v1/user/:name           |         Will delete a user by name in database         |
-|    GET    |         http://localhost:8090/card/listCreditCards          |         Will list all credit cards in database         |
-|    GET    |      http://localhost:8090/card/findByUserName/Flakrim      |    Will find a credit card by user name in database    |
-|   POST    |   http://localhost:8090/card/createCreditCardApplication    |         Will create a credit card application          |
-|    GET    | http://localhost:8090/card/getCreditCardApplication/Flakrim | Will find a credit card application by user first name |
+| HTTP call |                       Endpoint                        |                      Description                       |
+|:---------:|:-----------------------------------------------------:|:------------------------------------------------------:|
+|   POST    |           http://localhost:8090/api/v1/user           |             Will create a user in database             |
+|    GET    |     http://localhost:8090/api/v1/user/name/:name      |          Will find a user by name in database          |
+|    GET    |       http://localhost:8090/api/v1/user/id/:id        |           Will find a user by Id in database           |
+|    GET    |           http://localhost:8090/api/v1/user           |           Will find all the user in database           |
+|    PUT    |       http://localhost:8090/api/v1/user/id/:id        |          Will update a user by Id in database          |
+|    PUT    |     http://localhost:8090/api/v1/user/name/:name      |         Will update a user by name in database         |
+|  DELETE   |     http://localhost:8090/api/v1/user/name/:name      |         Will delete a user by name in database         |
+|    GET    |           http://localhost:8090/api/v1/card           |         Will list all credit cards in database         |
+|    GET    |    http://localhost:8090/api/v1/card/name/Flakrim     |    Will find a credit card by user name in database    |
+|   POST    |           http://localhost:8090/api/v1/card           |         Will create a credit card application          |
+|    GET    | http://localhost:8090/api/v1/card/application/Flakrim | Will find a credit card application by user first name |
 
 ## User Interface
 
 grpc-with-rest provides a User-interface to create a credit card application.
 
-User-interface is a multi-step react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
+User-interface is a multistep react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
 and with this form we are sending a POST request [http://localhost:8090/card/createCreditCardApplication] to the server.
 
-### To run the multi-step form, cd to ui directory and execute the following command:
+### To run the multistep form, cd to ui directory and execute the following command:
 
 #### `yarn start` or `npm install` 
 

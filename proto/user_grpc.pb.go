@@ -26,8 +26,6 @@ type UserServiceClient interface {
 	GetUserByName(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	GetUserById(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
-	FindUserFromGetUserByIdRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
-	FindUserFromGetUserByNameRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error)
 	PostPayload(ctx context.Context, in *AnyPayload, opts ...grpc.CallOption) (*Result, error)
 }
@@ -112,24 +110,6 @@ func (c *userServiceClient) SayHello(ctx context.Context, in *User, opts ...grpc
 	return out, nil
 }
 
-func (c *userServiceClient) FindUserFromGetUserByIdRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/FindUserFromGetUserByIdRPC", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) FindUserFromGetUserByNameRPC(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/FindUserFromGetUserByNameRPC", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userServiceClient) CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error) {
 	out := new(Payload)
 	err := c.cc.Invoke(ctx, "/helloworld.UserService/CreatePayload", in, out, opts...)
@@ -160,8 +140,6 @@ type UserServiceServer interface {
 	GetUserByName(context.Context, *User) (*User, error)
 	GetUserById(context.Context, *User) (*User, error)
 	SayHello(context.Context, *User) (*Message, error)
-	FindUserFromGetUserByIdRPC(context.Context, *User) (*User, error)
-	FindUserFromGetUserByNameRPC(context.Context, *User) (*User, error)
 	CreatePayload(context.Context, *Payload) (*Payload, error)
 	PostPayload(context.Context, *AnyPayload) (*Result, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -194,12 +172,6 @@ func (UnimplementedUserServiceServer) GetUserById(context.Context, *User) (*User
 }
 func (UnimplementedUserServiceServer) SayHello(context.Context, *User) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
-}
-func (UnimplementedUserServiceServer) FindUserFromGetUserByIdRPC(context.Context, *User) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindUserFromGetUserByIdRPC not implemented")
-}
-func (UnimplementedUserServiceServer) FindUserFromGetUserByNameRPC(context.Context, *User) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindUserFromGetUserByNameRPC not implemented")
 }
 func (UnimplementedUserServiceServer) CreatePayload(context.Context, *Payload) (*Payload, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePayload not implemented")
@@ -364,42 +336,6 @@ func _UserService_SayHello_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_FindUserFromGetUserByIdRPC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(User)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).FindUserFromGetUserByIdRPC(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/helloworld.UserService/FindUserFromGetUserByIdRPC",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FindUserFromGetUserByIdRPC(ctx, req.(*User))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_FindUserFromGetUserByNameRPC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(User)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).FindUserFromGetUserByNameRPC(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/helloworld.UserService/FindUserFromGetUserByNameRPC",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FindUserFromGetUserByNameRPC(ctx, req.(*User))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_CreatePayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Payload)
 	if err := dec(in); err != nil {
@@ -474,14 +410,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SayHello",
 			Handler:    _UserService_SayHello_Handler,
-		},
-		{
-			MethodName: "FindUserFromGetUserByIdRPC",
-			Handler:    _UserService_FindUserFromGetUserByIdRPC_Handler,
-		},
-		{
-			MethodName: "FindUserFromGetUserByNameRPC",
-			Handler:    _UserService_FindUserFromGetUserByNameRPC_Handler,
 		},
 		{
 			MethodName: "CreatePayload",
