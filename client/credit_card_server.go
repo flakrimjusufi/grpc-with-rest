@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	userpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc"
 	"log"
-	userpb "server/main.go/proto"
 	"time"
 )
 

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/flakrimjusufi/grpc-with-rest/handlers"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"os"
-	"server/main.go/handlers"
 )
 
 func main() {

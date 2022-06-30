@@ -1,4 +1,4 @@
-module server/main.go
+module github.com/flakrimjusufi/grpc-with-rest
 
 go 1.16
 

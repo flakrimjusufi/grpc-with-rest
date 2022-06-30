@@ -44,3 +44,6 @@ yarn-error.log*
 
 #sql
 /seeds/init.sql
+
+# Bazel files and directories
+bazel*
