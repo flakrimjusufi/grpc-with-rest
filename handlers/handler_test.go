@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -58,7 +59,7 @@ func TestGetUserById(t *testing.T) {
 
 	// Assertions
 	if assert.NoError(t, GetUserById(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, http.StatusInternalServerError, rec.Code)
 		assert.Equal(t, true, rec.Body.Len() > 0)
 	}
 }
@@ -80,7 +81,7 @@ func TestUpdateUserById(t *testing.T) {
 	// Assertions
 	if assert.NoError(t, UpdateUserById(c)) {
 		if rec.Code == http.StatusNotFound {
-			assert.Equal(t, http.StatusText(http.StatusNotFound), rec.Body.String())
+			assert.Errorf(t, fmt.Errorf(http.StatusText(http.StatusNotFound)), rec.Body.String())
 		} else {
 			assert.Equal(t, http.StatusOK, rec.Code)
 		}
