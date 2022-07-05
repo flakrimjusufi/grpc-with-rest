@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	db "github.com/flakrimjusufi/grpc-with-rest/database"
+	"github.com/flakrimjusufi/grpc-with-rest/models"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	db "server/main.go/database"
-	"server/main.go/models"
 	"strconv"
 )
 

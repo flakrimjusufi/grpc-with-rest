@@ -1,8 +1,8 @@
 package main
 
 import (
-	"server/main.go/database"
-	"server/main.go/models"
+	"github.com/flakrimjusufi/grpc-with-rest/database"
+	"github.com/flakrimjusufi/grpc-with-rest/models"
 )
 
 func main() {

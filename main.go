@@ -5,6 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	db "github.com/flakrimjusufi/grpc-with-rest/database"
+	"github.com/flakrimjusufi/grpc-with-rest/helper"
+	models "github.com/flakrimjusufi/grpc-with-rest/models"
+	userpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
@@ -17,10 +21,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	db "server/main.go/database"
-	"server/main.go/helper"
-	models "server/main.go/models"
-	userpb "server/main.go/proto"
 )
 
 const (

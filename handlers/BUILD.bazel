@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "handlers",
+    srcs = ["handler.go"],
+    importpath = "github.com/flakrimjusufi/grpc-with-rest/handlers",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//database",
+        "//models",
+        "@com_github_labstack_echo_v4//:echo",
+    ],
+)
+
+go_test(
+    name = "handlers_test",
+    srcs = ["handler_test.go"],
+    embed = [":handlers"],
+    tags = ["fast"],
+    deps = [
+        "@com_github_labstack_echo_v4//:echo",
+        "@com_github_stretchr_testify//assert",
+    ],
+)
