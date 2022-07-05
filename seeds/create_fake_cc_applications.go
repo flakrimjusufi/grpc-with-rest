@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/flakrimjusufi/grpc-with-rest/database"
+	"github.com/flakrimjusufi/grpc-with-rest/models"
 	"log"
-	"server/main.go/database"
-	"server/main.go/models"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func main() {
 		dateOfBirth := gofakeit.Date()
 		phoneNumber := gofakeit.Phone()
 		socialSecurityNumber := gofakeit.SSN()
-		employmentType := "Employer"
+		employmentType := "Administrator"
 		occupation := gofakeit.Job().Title
 		yearsEmployed := gofakeit.Number(1, 20)
 		monthlyIncome := gofakeit.Price(1000, 5000)
@@ -32,12 +32,12 @@ func main() {
 		state := gofakeit.State()
 		zip := gofakeit.Zip()
 		country := gofakeit.Country()
-		ownership := "Yes"
+		ownership := "No"
 		monthlyPayment := gofakeit.Price(300, 1200)
 		cardName := gofakeit.Name()
 		cardType := gofakeit.CreditCardType()
-		branch := "UCB"
-		cardBranding := "UCB card branding"
+		branch := "Bank"
+		cardBranding := "Bank card branding"
 
 		db.Create(&models.CreditCardApplication{
 			FirstName:            firstName,

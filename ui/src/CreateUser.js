@@ -32,7 +32,7 @@ function CreateUser() {
        reset: true
      })
     }, 30000);
-      axios.post("http://localhost:8090/user/create", {
+      axios.post("http://localhost:8090/api/v1/user", {
       name: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber
