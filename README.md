@@ -15,6 +15,8 @@ Basically, what this app does is described in the picture below:
 
 ## How to Run it?
 
+### Docker 
+
 **Clone the repo in your local environment:**
 
 ~~~~
@@ -27,10 +29,16 @@ git clone https://github.com/flakrimjusufi/grpc-with-rest.git
 **In case you have docker-compose installed in your machine, just execute the following:**
 
 ~~~~
-docker-compose up
+docker-compose up 
 ~~~~
 
-Docker-compose will build all the dependencies and will add a PostgreSQL image in your container alongside
+or 
+
+~~~
+make docker-up 
+~~~
+
+Docker-compose will build all the dependencies and will add a PostgresSQL image in your container alongside
 with the server so that we can interact with data.
 
 *Once the docker-compose is finished, you should see an output in terminal:*
@@ -52,8 +60,39 @@ You should have a response from server:
 }
 ~~~~
 
+### Bazel 
 
-## In case you don't have docker installed, you need to do the following:
+#### To run the project with Bazel
+
+~~~
+make bazel-run 
+~~~
+
+#### To clean project files that were built using with Bazel
+
+~~~
+make bazel-clean 
+~~~
+
+#### To set up the project with Bazel
+
+~~~
+make bazel-setup
+~~~
+
+#### To update dependencies with Bazel
+
+~~~
+make bazel-update-deps 
+~~~
+
+#### To run the test-cases with Bazel
+
+~~~
+make bazel-test 
+~~~
+
+#### In case you don't have docker or bazel installed, you need to do the following:
 
 ## Pre-requisites
 

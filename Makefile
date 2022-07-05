@@ -19,10 +19,6 @@ docker-up: ### Run docker-compose
 docker-restart: docker-down docker-up ### Restart containers
 .PHONY: docker-restart
 
-compose-up-integration-test: ### Run docker-compose with integration test
-	docker-compose up --build --abort-on-container-exit --exit-code-from integration
-.PHONY: compose-up-integration-test
-
 docker-down: ### Down docker-compose
 	docker-compose down --remove-orphans
 .PHONY: docker-down
