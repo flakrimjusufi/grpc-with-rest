@@ -272,5 +272,5 @@ We totally recommend all of their tools.
 
 Here are the ones that were used to build this project: 
 
-- **[GoLang](https://www.jetbrains.com/go/)** 
+- **[GoLand](https://www.jetbrains.com/go/)** 
 - **[DataGrip](https://www.jetbrains.com/datagrip/)**
