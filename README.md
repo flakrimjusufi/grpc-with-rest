@@ -29,10 +29,16 @@ git clone https://github.com/flakrimjusufi/grpc-with-rest.git
 **In case you have docker-compose installed in your machine, just execute the following:**
 
 ~~~~
-docker-compose up
+docker-compose up 
 ~~~~
 
-Docker-compose will build all the dependencies and will add a PostgreSQL image in your container alongside
+or 
+
+~~~
+make docker-up 
+~~~
+
+Docker-compose will build all the dependencies and will add a PostgresSQL image in your container alongside
 with the server so that we can interact with data.
 
 *Once the docker-compose is finished, you should see an output in terminal:*
