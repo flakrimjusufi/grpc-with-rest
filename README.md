@@ -260,3 +260,17 @@ Note that in order to interact with the server, you should also start up the gRP
 **[Watch a Demo Video](https://youtu.be/gIiTUbvQRzw)**
 
 [![DEMO](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/demo-screen-shoot.png)](https://youtu.be/gIiTUbvQRzw)
+
+
+### Acknowledgments
+
+Many thanks to **[JetBrains](https://www.jetbrains.com/)** for their help and their support on this project.
+
+Using their fantastic tools, we were able to write code, debug, test, document, build and ship quickly.
+
+We totally recommend all of their tools. 
+
+Here are the ones that were used to build this project: 
+
+- **[GoLang](https://www.jetbrains.com/go/)** 
+- **[DataGrip](https://www.jetbrains.com/datagrip/)**
