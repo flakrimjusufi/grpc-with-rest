@@ -3,27 +3,20 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    container_name: db
-    hostname: db
     ports:
        - "5432:5432"
     env_file:
       - .env
-    networks:
-      - grpcWithRest
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./seeds/init.sql.example:/docker-entrypoint-initdb.d/init.sql
-  grpc-server:
-    build: .
-    container_name: server
-    hostname: server
-    env_file:
-      - .env
-    networks:
-      - grpcWithRest
+      - ./seeds/init.sql:/docker-entrypoint-initdb.d/init.sql
+  app:
+    build: ./
+    container_name: app
     ports:
       - "8090:8090"
+    env_file:
+      - .env
     depends_on:
       - db
     deploy:
@@ -31,7 +24,3 @@ services:
         condition: on-failure
 volumes:
   db_data:
-
-networks:
-  grpcWithRest:
-    driver: bridge
