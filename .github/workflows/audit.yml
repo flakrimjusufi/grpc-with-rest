@@ -49,4 +49,4 @@ jobs:
         run: make bazel-test
 
       - name: Clean bazel
-        run: make bazel-clean`
+        run: make bazel-clean
