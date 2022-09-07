@@ -42,8 +42,11 @@ jobs:
       - name: Bazel setup
         run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
 
+      - name: Update Gazelle with Bazel
+        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update;
+
       - name: Update dependencies with Bazel
-        run: make bazel-update-deps
+        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update-repos -from_file=go.mod;
 
       - name: Run tests with Bazel
         run: make bazel-test
