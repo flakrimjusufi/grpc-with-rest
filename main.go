@@ -73,11 +73,12 @@ func (as *userServer) CreatePayload(ctx context.Context, in *userpb.Payload) (*u
 				"position": count,
 			}
 			log.Printf("%v %v = %d", reflect.TypeOf(value), key, count)
-			count += 1
+			count++
 			list = append(list, message)
 		}
 		jsonBytes, _ := protojson.Marshal(&userpb.Payload_Attributes{Values: attributes.GetValues()})
 		fmt.Println(string(jsonBytes))
+		fmt.Println(list)
 	}
 
 	return &userpb.Payload{Attributes: in.GetAttributes()}, nil
@@ -95,7 +96,7 @@ func (as *userServer) PostPayload(ctx context.Context, in *userpb.AnyPayload) (*
 	if rawError != nil {
 		panic(rawError)
 	}
-	log.Println(Prettify(result))
+	log.Println(prettify(result))
 
 	mapString := make(map[string]string)
 	for key, value := range result {
@@ -107,7 +108,7 @@ func (as *userServer) PostPayload(ctx context.Context, in *userpb.AnyPayload) (*
 	return &userpb.Result{Result: mapString}, nil
 }
 
-func Prettify(i interface{}) string {
+func prettify(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
 }
@@ -401,7 +402,7 @@ func main() {
 	userpb.RegisterCreditCardServiceServer(s, &creditCardServer{})
 
 	// Serve gRPC server
-	log.Println(fmt.Sprintf("Serving gRPC on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT")))
+	log.Printf("Serving gRPC on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT"))
 	go func() {
 		log.Fatalln(s.Serve(lis))
 	}()
@@ -436,7 +437,7 @@ func main() {
 		Handler: cors(gwmux),
 	}
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on %s:%s", os.Getenv("SERVER_HOST"),
-		os.Getenv("GRPC_GATEWAY_SERVER_PORT")))
+	log.Printf("Serving gRPC-Gateway on %s:%s", os.Getenv("SERVER_HOST"),
+		os.Getenv("GRPC_GATEWAY_SERVER_PORT"))
 	log.Fatalln(gwServer.ListenAndServe())
 }

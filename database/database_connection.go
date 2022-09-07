@@ -22,9 +22,10 @@ func Connect() *gorm.DB {
 	dbName := os.Getenv("DB_DATABASE")
 	dbHost := os.Getenv("DB_HOSTNAME")
 	dbType := os.Getenv("DB_TYPE")
+	dbPort := os.Getenv("DB_PORT")
 
-	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username,
-		dbName, password) // connection string
+	dbUri := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username,
+		password, dbName, dbPort) // connection string
 
 	database, err := gorm.Open(dbType, dbUri)
 	if err != nil {

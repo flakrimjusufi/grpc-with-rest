@@ -125,8 +125,8 @@ func TestDeleteUser(t *testing.T) {
 
 	// Assertions
 	if assert.NoError(t, DeleteUserByName(c)) {
-		if rec.Body.Len() == 0 {
-			assert.Equal(t, http.StatusNotFound, rec.Code)
+		if rec.Code == http.StatusNotFound {
+			assert.Equal(t, rec.Result().Status, "404 Not Found")
 		} else {
 			assert.Equal(t, http.StatusNoContent, rec.Code)
 		}
