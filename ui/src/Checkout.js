@@ -20,8 +20,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://www.ucbbank.com/">
-        UCB
+      <Link color="inherit" href="https://github.com/flakrimjusufi">
+        Flakrim
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -146,7 +146,7 @@ export default function Checkout() {
       console.log("activeStep ===>", activeStep);
       console.log("formValues ===>", formValues);
 
-      axios.post("http://localhost:8090/card/createCreditCardApplication", {
+      axios.post("http://localhost:8090/api/v1/card", {
 
         firstName: formValues['firstName'],
         lastName: formValues['lastName'],
@@ -205,7 +205,7 @@ export default function Checkout() {
       <AppBar position="absolute" color="default" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" color="inherit" noWrap>
-            United Community Bank
+            Community Bank
           </Typography>
         </Toolbar>
       </AppBar>

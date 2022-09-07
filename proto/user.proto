@@ -10,58 +10,59 @@ import "google/protobuf/timestamp.proto";
 service UserService {
   rpc CreateUser (User) returns (User) {
     option (google.api.http) = {
-      post: "/user/create"
+      post: "/api/v1/user"
       body: "*"
     };
   }
   rpc UpdateUserByName (User) returns (User) {
     option (google.api.http) = {
-      post: "/user/updateByName/{name}"
+      put: "/api/v1/user/name/{name}"
       body: "*"
     };
   }
   rpc UpdateUserById (User) returns (User) {
     option (google.api.http) = {
-      post: "/user/updateById/{id}"
+      put: "/api/v1/user/id/{id}"
       body: "*"
     };
   }
   rpc DeleteUser (User) returns (Message) {
     option (google.api.http) = {
-      post: "/user/delete"
-      body: "*"
+      delete: "/api/v1/user/name/{name}"
     };
   }
   rpc ListUsers (User) returns (ListUser) {
     option (google.api.http) = {
-      get: "/user/list"
+      get: "/api/v1/user"
     };
   }
   rpc GetUserByName (User) returns (User) {
     option (google.api.http) = {
-      get: "/user/findByName/{name}"
+      get: "/api/v1/user/name/{name}"
     };
   }
   rpc GetUserById (User) returns (User) {
     option (google.api.http) = {
-      get: "/user/findById/{id}"
+      get: "/api/v1/user/id/{id}"
     };
   }
   rpc SayHello (User) returns (Message) {
     option (google.api.http) = {
-      post: "/v1/example/echo"
+      post: "/api/v1/example/echo"
       body: "*"
     };
   }
-  rpc FindUserFromGetUserByIdRPC (User) returns (User) {
+
+  rpc CreatePayload (Payload) returns (Payload) {
     option (google.api.http) = {
-      get: "/user/findUserFromGetUserByIdRPC/{id}"
+      post: "/api/v1/payload"
+      body: "*"
     };
   }
 
-  rpc FindUserFromGetUserByNameRPC (User) returns (User) {
+  rpc PostPayload (AnyPayload) returns (Result) {
     option (google.api.http) = {
-      post: "/user/findUserFromGetUserNameRPC"
+      post: "/api/v1/postPayload"
       body: "*"
     };
   }
@@ -70,23 +71,23 @@ service UserService {
 service CreditCardService{
   rpc CreditCards (CreditCard) returns (ListCreditCards) {
     option (google.api.http) = {
-      get: "/card/listCreditCards"
+      get: "/api/v1/card"
     };
   }
   rpc GetCreditCardByUserName (CreditCard) returns (CreditCard) {
     option (google.api.http) = {
-      get: "/card/findByUserName/{name}"
+      get: "/api/v1/card/name/{name}"
     };
   }
   rpc CreateCreditCardApplication (CreditCardApplication) returns (CreditCardApplication) {
     option (google.api.http) = {
-      post: "/card/createCreditCardApplication"
+      post: "/api/v1/card"
       body: "*"
     };
   }
   rpc GetCreditCardApplicationByName (CreditCardApplication) returns (CreditCardApplication) {
     option (google.api.http) = {
-      get: "/card/getCreditCardApplication/{firstName}"
+      get: "/api/v1/card/application/{firstName}"
     };
   }
 }
@@ -100,6 +101,21 @@ message User {
 
 message Message {
   string message = 1;
+}
+
+message Payload {
+  message Attributes {
+    map<string, string> values = 1;
+  }
+  repeated Attributes attributes = 1;
+}
+
+message Result {
+  map<string, string> result = 1;
+}
+
+message AnyPayload {
+  string body = 1;
 }
 
 message ListUser {

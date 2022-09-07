@@ -13,6 +13,87 @@ Basically, what this app does is described in the picture below:
 
 ![](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/architecture_introduction_diagram.jpg)
 
+## How to Run it?
+
+### Docker 
+
+**Clone the repo in your local environment:**
+
+~~~~
+git clone https://github.com/flakrimjusufi/grpc-with-rest.git
+~~~~
+
+*Remove ".example" from both .env.example and /seeds/init.sql.example and populate them with your environment variables.*
+
+
+**In case you have docker-compose installed in your machine, just execute the following:**
+
+~~~~
+docker-compose up 
+~~~~
+
+or 
+
+~~~
+make docker-up 
+~~~
+
+Docker-compose will build all the dependencies and will add a PostgresSQL image in your container alongside
+with the server so that we can interact with data.
+
+*Once the docker-compose is finished, you should see an output in terminal:*
+
+~~~
+Serving gRPC on localhost:8080
+Serving gRPC-Gateway on localhost:8090
+~~~
+
+*Send a POST request using cURL:*
+
+`curl -X POST -k http://localhost:8090/api/v1/example/echo -d '{"name": "Flakrim"}'`
+
+~~~~
+You should have a response from server: 
+
+{
+  "message": "Hello Flakrim"
+}
+~~~~
+
+### Bazel 
+
+#### To run the project with Bazel
+
+~~~
+make bazel-run 
+~~~
+
+#### To clean project files that were built using with Bazel
+
+~~~
+make bazel-clean 
+~~~
+
+#### To set up the project with Bazel
+
+~~~
+make bazel-setup
+~~~
+
+#### To update dependencies with Bazel
+
+~~~
+make bazel-update-deps 
+~~~
+
+#### To run the test-cases with Bazel
+
+~~~
+make bazel-test 
+~~~
+
+#### In case you don't have docker or bazel installed, you need to do the following:
+
 ## Pre-requisites
 
 ### 1. Go
@@ -22,7 +103,7 @@ Basically, what this app does is described in the picture below:
 For installation instructions, see Go's getting started guide: https://golang.org/doc/install
 ~~~~
 
-### 2. PostgreSQL (or any SQL database)
+### 2. PostgresSQL (or any SQL database)
 
 ~~~~
 [Version 9+]
@@ -40,14 +121,28 @@ git clone https://github.com/flakrimjusufi/grpc-with-rest.git
 **2. Populate environment variables in .env file:**
 
 ~~~~
-db_name = (PostgreSQL database name, for example: testdb)
-db_pass = (PostgreSQL database password, for example: 123456)
-db_user = (PostgreSQL database user, for example: testuser)
-db_type = (PostgreSQL database type, for example: postgres)
-db_host = (PostgreSQL database host, for example: localhost)
-db_port = (PostgreSQL database port, for example: 5434)
-server_host = (The server in which you will run the app, for example: 0.0.0.0)
-server_port = (The port in which you will run the server, for example: :8090) 
+DB_USERNAME=
+DB_DATABASE=
+DB_HOSTNAME=
+DB_PORT=
+DB_TYPE=
+POSTGRES_PASSWORD=
+SERVER_HOST=
+GRPC_SERVER_PORT=
+GRPC_GATEWAY_SERVER_PORT=
+~~~~
+
+**.env file example**
+~~~~
+DB_USERNAME = (PostgreSQL database user, for example: testuser)
+DB_DATABASE = (PostgreSQL database name, for example: testdb)
+DB_HOSTNAME = (PostgreSQL database host, for example: localhost)
+DB_TYPE = (PostgreSQL database type, for example: postgres)
+DB_PORT = (PostgreSQL database port, for example: 5434)
+POSTGRES_PASSWORD = (PostgreSQL database password, for example: 123456)
+SERVER_HOST = (The server in which you will run the app, for example: 0.0.0.0)
+GRPC_SERVER_PORT = (The port in which you will run the app, for example: 8080
+GRPC_GATEWAY_SERVER_PORT = (The port in which you will run the server, for example: 8090) 
 ~~~~
 
 **3. Run the server first:**
@@ -62,7 +157,7 @@ Serving gRPC-Gateway on 0.0.0.0:8090
 
 **4. Send a POST request using cURL:**
 
-`curl -X POST -k http://localhost:8090/v1/example/echo -d '{"name": "Flakrim"}'`
+`curl -X POST -k http://localhost:8090/api/v1/example/echo -d '{"name": "Flakrim"}'`
 
 ~~~~
 You should have a response from server: 
@@ -123,27 +218,28 @@ There are three data models which we are using in this app:
 After populating the database, you can use the below es to hit the reverse proxy server and to get the data from the
 server:
 
-| HTTP call        | Endpoint           | Description  |
-| :-------------: |:-------------:| :-----:|
-| POST     | http://localhost:8090/user/create | Will create a user in database |
-| GET      | http://localhost:8090/user/findByName/Flakrim      |  Will find a user by name in database |
-| GET | http://localhost:8090/user/findById/120023      |   Will find a user by Id in database |
-| GET | http://localhost:8090/user/list     |   Will find all the user in database |
-| POST | http://localhost:8090/user/updateById/12003     |   Will update a user by Id in database |
-| POST | http://localhost:8090/user/delete     |   Will delete a user by name in database |
-| GET | http://localhost:8090/card/listCreditCards     |   Will list all credit cards in database |
-| GET | http://localhost:8090/card/findByUserName/Flakrim     |   Will find a credit card by user name in database |
-| POST | http://localhost:8090/card/createCreditCardApplication | Will create a credit card application |
-| GET | http://localhost:8090/card/getCreditCardApplication/Flakrim | Will find a credit card application by user first name |
+| HTTP call |                       Endpoint                        |                      Description                       |
+|:---------:|:-----------------------------------------------------:|:------------------------------------------------------:|
+|   POST    |           http://localhost:8090/api/v1/user           |             Will create a user in database             |
+|    GET    |     http://localhost:8090/api/v1/user/name/:name      |          Will find a user by name in database          |
+|    GET    |       http://localhost:8090/api/v1/user/id/:id        |           Will find a user by Id in database           |
+|    GET    |           http://localhost:8090/api/v1/user           |           Will find all the user in database           |
+|    PUT    |       http://localhost:8090/api/v1/user/id/:id        |          Will update a user by Id in database          |
+|    PUT    |     http://localhost:8090/api/v1/user/name/:name      |         Will update a user by name in database         |
+|  DELETE   |     http://localhost:8090/api/v1/user/name/:name      |         Will delete a user by name in database         |
+|    GET    |           http://localhost:8090/api/v1/card           |         Will list all credit cards in database         |
+|    GET    |    http://localhost:8090/api/v1/card/name/Flakrim     |    Will find a credit card by user name in database    |
+|   POST    |           http://localhost:8090/api/v1/card           |         Will create a credit card application          |
+|    GET    | http://localhost:8090/api/v1/card/application/Flakrim | Will find a credit card application by user first name |
 
 ## User Interface
 
 grpc-with-rest provides a User-interface to create a credit card application.
 
-User-interface is a multi-step react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
+User-interface is a multistep react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
 and with this form we are sending a POST request [http://localhost:8090/card/createCreditCardApplication] to the server.
 
-### To run the multi-step form, cd to ui directory and execute the following command:
+### To run the multistep form, cd to ui directory and execute the following command:
 
 #### `yarn start` or `npm install` 
 
@@ -164,3 +260,17 @@ Note that in order to interact with the server, you should also start up the gRP
 **[Watch a Demo Video](https://youtu.be/gIiTUbvQRzw)**
 
 [![DEMO](https://github.com/flakrimjusufi/grpc-with-rest/blob/develop/images/demo-screen-shoot.png)](https://youtu.be/gIiTUbvQRzw)
+
+
+### Acknowledgments
+
+Many thanks to **[JetBrains](https://www.jetbrains.com/)** for their help and their support on this project.
+
+Using their fantastic tools, we were able to write code, debug, test, document, build and ship quickly.
+
+We totally recommend all of their tools. 
+
+Here are the ones that were used to build this project: 
+
+- **[GoLand](https://www.jetbrains.com/go/)** 
+- **[DataGrip](https://www.jetbrains.com/datagrip/)**

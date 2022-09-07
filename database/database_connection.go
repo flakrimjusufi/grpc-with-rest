@@ -2,40 +2,47 @@ package database
 
 import (
 	"fmt"
+	"github.com/flakrimjusufi/grpc-with-rest/models"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
-)
-
-const (
-	colorRed = "\033[31m"
+	"time"
 )
 
 func Connect() *gorm.DB {
-
-	e := godotenv.Load() //Load .env file
-	if e != nil {
-		fmt.Print(e)
+	if os.Getenv("DB_USERNAME") == "" {
+		e := godotenv.Load() //Load .env file for local environment
+		if e != nil {
+			panic(e)
+		}
 	}
+	username := os.Getenv("DB_USERNAME")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("DB_DATABASE")
+	dbHost := os.Getenv("DB_HOSTNAME")
+	dbType := os.Getenv("DB_TYPE")
+	dbPort := os.Getenv("DB_PORT")
 
-	username := os.Getenv("db_user")
-	password := os.Getenv("db_pass")
-	dbName := os.Getenv("db_name")
-	dbHost := os.Getenv("db_host")
-	dbType := os.Getenv("db_type")
+	dbUri := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username,
+		password, dbName, dbPort) // connection string
 
-	if dbHost == "" || dbName == "" || dbType == "" {
-		log.Println(colorRed, ".env file is empty. Please add the environment variables in .env file first and run the server again!")
-	}
-
-	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password) //Build connection string
-
-	db, err := gorm.Open(dbType, dbUri)
+	database, err := gorm.Open(dbType, dbUri)
 	if err != nil {
 		panic(err)
 	}
-	return db
+	database.Debug().AutoMigrate(models.User{})
+	database.Debug().AutoMigrate(models.CreditCards{})
+	database.Debug().AutoMigrate(models.CreditCardApplication{})
 
+	// SetMaxIdleConnections sets the maximum number of connections in the idle connection pool.
+	database.DB().SetMaxIdleConns(10)
+
+	// SetMaxOpenConnections sets the maximum number of open connections to the database.
+	database.DB().SetMaxOpenConns(100)
+
+	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
+	database.DB().SetConnMaxLifetime(time.Hour)
+
+	return database
 }

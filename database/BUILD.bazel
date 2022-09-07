@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "database",
+    srcs = ["database_connection.go"],
+    importpath = "github.com/flakrimjusufi/grpc-with-rest/database",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//models",
+        "@com_github_jinzhu_gorm//:gorm",
+        "@com_github_jinzhu_gorm//dialects/postgres",
+        "@com_github_joho_godotenv//:godotenv",
+    ],
+)

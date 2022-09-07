@@ -1,12 +1,14 @@
+//go:build exclude
+// +build exclude
+
 package main
 
 import (
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/flakrimjusufi/grpc-with-rest/database"
+	"github.com/flakrimjusufi/grpc-with-rest/models"
 	"log"
-	"server/main.go/database"
-	"server/main.go/models"
 )
-
 
 func main() {
 

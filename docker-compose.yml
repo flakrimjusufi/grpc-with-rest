@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    ports:
+       - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./seeds/init.sql:/docker-entrypoint-initdb.d/init.sql
+  app:
+    build: ./
+    container_name: app
+    ports:
+      - "8090:8090"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+volumes:
+  db_data:
