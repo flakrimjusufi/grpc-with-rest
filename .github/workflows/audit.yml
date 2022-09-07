@@ -39,5 +39,5 @@ jobs:
       - name: Run golint
         run: golint ./...
 
-      - name: Run tests
-        run: go test -race -vet=off ./handlers
+      - name: Run Bazel
+        run: @bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
