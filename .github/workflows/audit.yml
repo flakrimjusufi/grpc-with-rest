@@ -2,9 +2,9 @@ name: Audit
 
 on:
   push:
-    branches: [develop]
+    branches: [ develop ]
   pull_request:
-    branches: [develop]
+    branches: [ develop ]
 
 jobs:
 
@@ -40,13 +40,13 @@ jobs:
         run: golint ./...
 
       - name: Bazel setup
-        run: make bazel-setup
+        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
 
       - name: Update dependencies with Bazel
         run: make bazel-update-deps
 
       - name: Run tests with Bazel
-        run:  make bazel-test
+        run: make bazel-test
 
       - name: Clean bazel
-        run: make bazel-clean
+        run: make bazel-clean`
