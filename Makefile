@@ -69,8 +69,8 @@ bazel-test: ### runs the test cases with bazel
 	@echo "::bazel-test"; \
     bazelisk test \
     	--action_env=DB_TYPE=$(DB_TYPE) \
+    	--action_env=DB_DATABASE=$(DB_DATABASE) \
     	--action_env=DB_USERNAME=$(DB_USERNAME) \
-    	--action_env=DB_PASSWORD=$(DB_PASSWORD) \
     	--action_env=DB_HOSTNAME=$(DB_HOSTNAME) \
     	--action_env=DB_PORT=$(DB_PORT) \
     	--action_env=POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \

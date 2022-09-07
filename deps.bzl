@@ -430,8 +430,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_jinzhu_now",
         importpath = "github.com/jinzhu/now",
-        sum = "h1:HjfetcXq097iXP0uoPCdnM4Efp5/9MsM0/M+XOTeR3M=",
-        version = "v1.0.1",
+        sum = "h1:tHnRBy1i5F2Dh8BAFxqFzxKqqvezXrL2OW1TnX+Mlas=",
+        version = "v1.1.4",
     )
     go_repository(
         name = "com_github_joho_godotenv",
