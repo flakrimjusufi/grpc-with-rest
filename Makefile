@@ -33,6 +33,12 @@ docker-rm-volume: ### remove docker volume
 	docker volume rm neocharge_database_data
 .PHONY: docker-rm-volume
 
+docker-clean-images: ## deletes untagged images
+	echo "docker-clean-images";
+	echo ">>> Deleting untagged images";
+	docker rmi `docker images -f dangling=true -q`
+.PHONY: docker-clean-images
+
 ### BAZEL COMMANDS
 bazel-clean: ### clean bazel cached files
 	@echo "::bazel-clean";
