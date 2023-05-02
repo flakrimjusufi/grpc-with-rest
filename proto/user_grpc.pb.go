@@ -26,8 +26,6 @@ type UserServiceClient interface {
 	GetUserByName(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	GetUserByID(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 	SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
-	CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error)
-	PostPayload(ctx context.Context, in *AnyPayload, opts ...grpc.CallOption) (*Result, error)
 }
 
 type userServiceClient struct {
@@ -40,7 +38,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) CreateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/CreateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/CreateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +47,7 @@ func (c *userServiceClient) CreateUser(ctx context.Context, in *User, opts ...gr
 
 func (c *userServiceClient) UpdateUserByName(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/UpdateUserByName", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +56,7 @@ func (c *userServiceClient) UpdateUserByName(ctx context.Context, in *User, opts
 
 func (c *userServiceClient) UpdateUserByID(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/UpdateUserByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +65,7 @@ func (c *userServiceClient) UpdateUserByID(ctx context.Context, in *User, opts .
 
 func (c *userServiceClient) DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/DeleteUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/DeleteUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +74,7 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *User, opts ...gr
 
 func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grpc.CallOption) (*ListUser, error) {
 	out := new(ListUser)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/ListUsers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/ListUsers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *User, opts ...grp
 
 func (c *userServiceClient) GetUserByName(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/GetUserByName", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +92,7 @@ func (c *userServiceClient) GetUserByName(ctx context.Context, in *User, opts ..
 
 func (c *userServiceClient) GetUserByID(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/GetUserByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,25 +101,7 @@ func (c *userServiceClient) GetUserByID(ctx context.Context, in *User, opts ...g
 
 func (c *userServiceClient) SayHello(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/SayHello", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) CreatePayload(ctx context.Context, in *Payload, opts ...grpc.CallOption) (*Payload, error) {
-	out := new(Payload)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/CreatePayload", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) PostPayload(ctx context.Context, in *AnyPayload, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/helloworld.UserService/PostPayload", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/SayHello", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +120,6 @@ type UserServiceServer interface {
 	GetUserByName(context.Context, *User) (*User, error)
 	GetUserByID(context.Context, *User) (*User, error)
 	SayHello(context.Context, *User) (*Message, error)
-	CreatePayload(context.Context, *Payload) (*Payload, error)
-	PostPayload(context.Context, *AnyPayload) (*Result, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -173,12 +151,6 @@ func (UnimplementedUserServiceServer) GetUserByID(context.Context, *User) (*User
 func (UnimplementedUserServiceServer) SayHello(context.Context, *User) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
-func (UnimplementedUserServiceServer) CreatePayload(context.Context, *Payload) (*Payload, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreatePayload not implemented")
-}
-func (UnimplementedUserServiceServer) PostPayload(context.Context, *AnyPayload) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostPayload not implemented")
-}
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
 // UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -202,7 +174,7 @@ func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/CreateUser",
+		FullMethod: "/user.UserService/CreateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).CreateUser(ctx, req.(*User))
@@ -220,7 +192,7 @@ func _UserService_UpdateUserByName_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/UpdateUserByName",
+		FullMethod: "/user.UserService/UpdateUserByName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).UpdateUserByName(ctx, req.(*User))
@@ -238,7 +210,7 @@ func _UserService_UpdateUserByID_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/UpdateUserByID",
+		FullMethod: "/user.UserService/UpdateUserByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).UpdateUserByID(ctx, req.(*User))
@@ -256,7 +228,7 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/DeleteUser",
+		FullMethod: "/user.UserService/DeleteUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).DeleteUser(ctx, req.(*User))
@@ -274,7 +246,7 @@ func _UserService_ListUsers_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/ListUsers",
+		FullMethod: "/user.UserService/ListUsers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).ListUsers(ctx, req.(*User))
@@ -292,7 +264,7 @@ func _UserService_GetUserByName_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/GetUserByName",
+		FullMethod: "/user.UserService/GetUserByName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserByName(ctx, req.(*User))
@@ -310,7 +282,7 @@ func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/GetUserByID",
+		FullMethod: "/user.UserService/GetUserByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserByID(ctx, req.(*User))
@@ -328,46 +300,10 @@ func _UserService_SayHello_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.UserService/SayHello",
+		FullMethod: "/user.UserService/SayHello",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).SayHello(ctx, req.(*User))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_CreatePayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Payload)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).CreatePayload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/helloworld.UserService/CreatePayload",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CreatePayload(ctx, req.(*Payload))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_PostPayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AnyPayload)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).PostPayload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/helloworld.UserService/PostPayload",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).PostPayload(ctx, req.(*AnyPayload))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -376,7 +312,7 @@ func _UserService_PostPayload_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "helloworld.UserService",
+	ServiceName: "user.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -411,14 +347,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SayHello",
 			Handler:    _UserService_SayHello_Handler,
 		},
-		{
-			MethodName: "CreatePayload",
-			Handler:    _UserService_CreatePayload_Handler,
-		},
-		{
-			MethodName: "PostPayload",
-			Handler:    _UserService_PostPayload_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/user.proto",
@@ -444,7 +372,7 @@ func NewCreditCardServiceClient(cc grpc.ClientConnInterface) CreditCardServiceCl
 
 func (c *creditCardServiceClient) CreditCards(ctx context.Context, in *CreditCard, opts ...grpc.CallOption) (*ListCreditCards, error) {
 	out := new(ListCreditCards)
-	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/CreditCards", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.CreditCardService/CreditCards", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -453,7 +381,7 @@ func (c *creditCardServiceClient) CreditCards(ctx context.Context, in *CreditCar
 
 func (c *creditCardServiceClient) GetCreditCardByUserName(ctx context.Context, in *CreditCard, opts ...grpc.CallOption) (*CreditCard, error) {
 	out := new(CreditCard)
-	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/GetCreditCardByUserName", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.CreditCardService/GetCreditCardByUserName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +390,7 @@ func (c *creditCardServiceClient) GetCreditCardByUserName(ctx context.Context, i
 
 func (c *creditCardServiceClient) CreateCreditCardApplication(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error) {
 	out := new(CreditCardApplication)
-	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/CreateCreditCardApplication", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.CreditCardService/CreateCreditCardApplication", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -471,7 +399,7 @@ func (c *creditCardServiceClient) CreateCreditCardApplication(ctx context.Contex
 
 func (c *creditCardServiceClient) GetCreditCardApplicationByName(ctx context.Context, in *CreditCardApplication, opts ...grpc.CallOption) (*CreditCardApplication, error) {
 	out := new(CreditCardApplication)
-	err := c.cc.Invoke(ctx, "/helloworld.CreditCardService/GetCreditCardApplicationByName", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.CreditCardService/GetCreditCardApplicationByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -528,7 +456,7 @@ func _CreditCardService_CreditCards_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.CreditCardService/CreditCards",
+		FullMethod: "/user.CreditCardService/CreditCards",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CreditCardServiceServer).CreditCards(ctx, req.(*CreditCard))
@@ -546,7 +474,7 @@ func _CreditCardService_GetCreditCardByUserName_Handler(srv interface{}, ctx con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.CreditCardService/GetCreditCardByUserName",
+		FullMethod: "/user.CreditCardService/GetCreditCardByUserName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CreditCardServiceServer).GetCreditCardByUserName(ctx, req.(*CreditCard))
@@ -564,7 +492,7 @@ func _CreditCardService_CreateCreditCardApplication_Handler(srv interface{}, ctx
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.CreditCardService/CreateCreditCardApplication",
+		FullMethod: "/user.CreditCardService/CreateCreditCardApplication",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CreditCardServiceServer).CreateCreditCardApplication(ctx, req.(*CreditCardApplication))
@@ -582,7 +510,7 @@ func _CreditCardService_GetCreditCardApplicationByName_Handler(srv interface{}, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.CreditCardService/GetCreditCardApplicationByName",
+		FullMethod: "/user.CreditCardService/GetCreditCardApplicationByName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CreditCardServiceServer).GetCreditCardApplicationByName(ctx, req.(*CreditCardApplication))
@@ -594,7 +522,7 @@ func _CreditCardService_GetCreditCardApplicationByName_Handler(srv interface{}, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CreditCardService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "helloworld.CreditCardService",
+	ServiceName: "user.CreditCardService",
 	HandlerType: (*CreditCardServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
