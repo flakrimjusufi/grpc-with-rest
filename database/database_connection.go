@@ -2,14 +2,16 @@ package database
 
 import (
 	"fmt"
-	"github.com/flakrimjusufi/grpc-with-rest/models"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/joho/godotenv"
 	"os"
 	"time"
+
+	"github.com/flakrimjusufi/grpc-with-rest/models"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // imports postgres dialect
+	"github.com/joho/godotenv"
 )
 
+// Connect - connects to the DB
 func Connect() *gorm.DB {
 	if os.Getenv("DB_USERNAME") == "" {
 		e := godotenv.Load() //Load .env file for local environment
@@ -24,10 +26,10 @@ func Connect() *gorm.DB {
 	dbType := os.Getenv("DB_TYPE")
 	dbPort := os.Getenv("DB_PORT")
 
-	dbUri := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username,
+	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username,
 		password, dbName, dbPort) // connection string
 
-	database, err := gorm.Open(dbType, dbUri)
+	database, err := gorm.Open(dbType, dbURI)
 	if err != nil {
 		panic(err)
 	}

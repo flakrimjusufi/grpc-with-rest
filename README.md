@@ -2,7 +2,9 @@
 
 This is a gRPC app build with Go, [gRPC-Gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 and [ProtoBuff](https://developers.google.com/protocol-buffers) using HTTP as transport layer. It was build with the
-purpose of having both gRPC and RESTful style integrated.
+purpose of having both gRPC and REST-ful style integrated and can be used as a template to start a project in gRPC 
+with a SQL database and a UI integrated.
+
 
 grpc-with-rest performs a [transcoding of HTTP calls to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding)
 using a proxy server.
@@ -62,34 +64,16 @@ You should have a response from server:
 
 ### Bazel 
 
-#### To run the project with Bazel
-
-~~~
-make bazel-run 
-~~~
-
-#### To clean project files that were built using with Bazel
-
-~~~
-make bazel-clean 
-~~~
-
 #### To set up the project with Bazel
 
 ~~~
 make bazel-setup
 ~~~
 
-#### To update dependencies with Bazel
+#### To run the project with Bazel
 
 ~~~
-make bazel-update-deps 
-~~~
-
-#### To run the test-cases with Bazel
-
-~~~
-make bazel-test 
+make bazel-run 
 ~~~
 
 #### In case you don't have docker or bazel installed, you need to do the following:
@@ -99,7 +83,7 @@ make bazel-test
 ### 1. Go
 
 ~~~~
-[https://golang.org/], any one of the three latest major releases of Go.
+[https://golang.org/], any one of the three latest major releases of Go (1.18 was used in this project) 
 For installation instructions, see Go's getting started guide: https://golang.org/doc/install
 ~~~~
 
@@ -138,7 +122,7 @@ DB_USERNAME = (PostgreSQL database user, for example: testuser)
 DB_DATABASE = (PostgreSQL database name, for example: testdb)
 DB_HOSTNAME = (PostgreSQL database host, for example: localhost)
 DB_TYPE = (PostgreSQL database type, for example: postgres)
-DB_PORT = (PostgreSQL database port, for example: 5434)
+DB_PORT = (PostgreSQL database port, for example: 5432)
 POSTGRES_PASSWORD = (PostgreSQL database password, for example: 123456)
 SERVER_HOST = (The server in which you will run the app, for example: 0.0.0.0)
 GRPC_SERVER_PORT = (The port in which you will run the app, for example: 8080
@@ -236,7 +220,7 @@ server:
 
 grpc-with-rest provides a User-interface to create a credit card application.
 
-User-interface is a multistep react integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
+User-interface is a multistep React integrated with gRPC services. We are performing a transcoding of HTTP over gRPC
 and with this form we are sending a POST request [http://localhost:8090/card/createCreditCardApplication] to the server.
 
 ### To run the multistep form, cd to ui directory and execute the following command:

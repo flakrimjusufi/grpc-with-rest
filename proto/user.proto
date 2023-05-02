@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package helloworld;
+package user;
 
 option go_package = "/proto";
 
@@ -20,7 +20,7 @@ service UserService {
       body: "*"
     };
   }
-  rpc UpdateUserById (User) returns (User) {
+  rpc UpdateUserByID (User) returns (User) {
     option (google.api.http) = {
       put: "/api/v1/user/id/{id}"
       body: "*"
@@ -41,7 +41,7 @@ service UserService {
       get: "/api/v1/user/name/{name}"
     };
   }
-  rpc GetUserById (User) returns (User) {
+  rpc GetUserByID (User) returns (User) {
     option (google.api.http) = {
       get: "/api/v1/user/id/{id}"
     };
@@ -49,20 +49,6 @@ service UserService {
   rpc SayHello (User) returns (Message) {
     option (google.api.http) = {
       post: "/api/v1/example/echo"
-      body: "*"
-    };
-  }
-
-  rpc CreatePayload (Payload) returns (Payload) {
-    option (google.api.http) = {
-      post: "/api/v1/payload"
-      body: "*"
-    };
-  }
-
-  rpc PostPayload (AnyPayload) returns (Result) {
-    option (google.api.http) = {
-      post: "/api/v1/postPayload"
       body: "*"
     };
   }
