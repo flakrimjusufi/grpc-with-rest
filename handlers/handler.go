@@ -10,6 +10,7 @@ import (
 
 var database = db.Connect().Debug()
 
+// CreateUser -.
 func CreateUser(c echo.Context) error {
 
 	user := new(models.User)
@@ -28,15 +29,16 @@ func CreateUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, user)
 }
 
-func UpdateUserById(c echo.Context) error {
+// UpdateUserByID -.
+func UpdateUserByID(c echo.Context) error {
 
 	user := models.User{}
-	userId, err := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	query := database.Where("id =?", userId).Find(&user)
+	query := database.Where("id =?", userID).Find(&user)
 
 	if query.Error != nil {
 		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
@@ -51,6 +53,7 @@ func UpdateUserById(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
+// UpdateUserByName -.
 func UpdateUserByName(c echo.Context) error {
 
 	user := models.User{}
@@ -70,6 +73,7 @@ func UpdateUserByName(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
+// DeleteUserByName -.
 func DeleteUserByName(c echo.Context) error {
 
 	user := new(models.User)
@@ -89,6 +93,7 @@ func DeleteUserByName(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, result.RowsAffected)
 }
 
+// GetAllUsers -.
 func GetAllUsers(c echo.Context) error {
 
 	var users []models.User
@@ -101,6 +106,7 @@ func GetAllUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
+// GetUserByName -.
 func GetUserByName(c echo.Context) error {
 
 	user := models.User{}
@@ -121,15 +127,16 @@ func GetUserByName(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-func GetUserById(c echo.Context) error {
+// GetUserByID -.
+func GetUserByID(c echo.Context) error {
 
 	user := models.User{}
-	userId, err := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	query := database.Where("id =?", userId).Find(&user)
+	query := database.Where("id =?", userID).Find(&user)
 
 	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, query.Error)

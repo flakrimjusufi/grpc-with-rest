@@ -5,6 +5,7 @@ import (
 	"regexp"
 )
 
+// AllowedOrigin - Used to add the cors in header
 func AllowedOrigin(origin string) bool {
 	if viper.GetString("cors") == "*" {
 		return true

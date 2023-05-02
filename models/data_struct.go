@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// User - handles the ORM of Users table and the response of gRPC services
 type User struct {
 	gorm.Model
 	Name        string `json:"name" form:"name"`
@@ -12,6 +13,7 @@ type User struct {
 	PhoneNumber string `json:"phoneNumber" form:"phoneNumber"`
 }
 
+// CreditCards - handles the ORM of CreditCards table and the response of gRPC services
 type CreditCards struct {
 	ID          uint   `gorm:"primary_key"`
 	Name        string `json:"name"`
@@ -27,6 +29,7 @@ type CreditCards struct {
 	DeletedAt   time.Time
 }
 
+// CreditCardApplication - handles the ORM of CreditCardApplication table and the response of gRPC services
 type CreditCardApplication struct {
 	ID                   uint      `gorm:"primary_key"`
 	FirstName            string    `json:"firstName"`

@@ -142,7 +142,7 @@ func (as *userServer) UpdateUserByName(ctx context.Context, in *userpb.User) (*u
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *userServer) UpdateUserById(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+func (as *userServer) UpdateUserByID(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 
 	id := in.GetId()
 	name := in.GetName()
@@ -205,7 +205,7 @@ func (as *userServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb.User, error) {
+func (as *userServer) GetUserByID(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	id := in.GetId()
 	var user models.User
 	rowsAffected := database.Where("id = ?", id).Find(&user).RowsAffected
@@ -215,22 +215,6 @@ func (as *userServer) GetUserById(ctx context.Context, in *userpb.User) (*userpb
 	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
-}
-
-func (as *userServer) FindUserFromGetUserByIdRPC(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-
-	user, _ := as.GetUserById(ctx, in)
-
-	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(),
-		PhoneNumber: user.GetPhoneNumber()}, nil
-}
-
-func (as *userServer) FindUserFromGetUserByNameRPC(ctx context.Context, in *userpb.User) (*userpb.User, error) {
-
-	user, _ := as.GetUserByName(ctx, in)
-
-	return &userpb.User{Id: user.GetId(), Name: user.GetName(), Email: user.GetEmail(),
-		PhoneNumber: user.GetPhoneNumber()}, nil
 }
 
 func (fu *creditCardServer) CreditCards(ctx context.Context, in *userpb.CreditCard) (*userpb.ListCreditCards, error) {

@@ -25,9 +25,9 @@ func main() {
 
 	e.GET("/user/", handlers.GetAllUsers)
 	e.GET("/user/:name", handlers.GetUserByName)
-	e.GET("/user/:id", handlers.GetUserById)
+	e.GET("/user/:id", handlers.GetUserByID)
 	e.POST("/user", handlers.CreateUser)
-	e.PUT("/user/:id", handlers.UpdateUserById)
+	e.PUT("/user/:id", handlers.UpdateUserByID)
 	e.PUT("/user/:name", handlers.UpdateUserByName)
 	e.DELETE("/user/:name", handlers.DeleteUserByName)
 
