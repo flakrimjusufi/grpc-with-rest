@@ -58,7 +58,7 @@ func TestGetUserById(t *testing.T) {
 	c.SetParamValues("1")
 
 	// Assertions
-	if assert.NoError(t, GetUserById(c)) {
+	if assert.NoError(t, GetUserByID(c)) {
 		assert.Equal(t, http.StatusInternalServerError, rec.Code)
 		assert.Equal(t, true, rec.Body.Len() > 0)
 	}
@@ -79,7 +79,7 @@ func TestUpdateUserById(t *testing.T) {
 	c.SetParamValues("1")
 
 	// Assertions
-	if assert.NoError(t, UpdateUserById(c)) {
+	if assert.NoError(t, UpdateUserByID(c)) {
 		if rec.Code == http.StatusNotFound {
 			assert.Errorf(t, fmt.Errorf(http.StatusText(http.StatusNotFound)), rec.Body.String())
 		} else {
