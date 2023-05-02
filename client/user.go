@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/flakrimjusufi/grpc-with-rest/models"
-	"github.com/flakrimjusufi/grpc-with-rest/proto"
 	userpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,28 +16,32 @@ const (
 	colorYellow = "\033[33m"
 )
 
+// UserServer - the grpc server of users
 type UserServer struct {
 	userpb.UnimplementedUserServiceServer
 }
 
-func (as *UserServer) SayHello(ctx context.Context, in *proto.User) (*proto.Message, error) {
-	return &proto.Message{Message: "Hello " + in.Name}, nil
+// SayHello - the service that prints a given name in the output
+func (us *UserServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
+	return &userpb.Message{Message: "Hello " + in.Name}, nil
 }
 
-func (as *UserServer) CreateUser(ctx context.Context, in *proto.User) (*proto.User, error) {
+// CreateUser - the service that creates a user in the Users table and returns userpb.User
+func (us *UserServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	user := models.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}
 
 	database.NewRecord(user)
 	database.Create(&user)
 
-	return &proto.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *UserServer) UpdateUserByName(ctx context.Context, in *proto.User) (*proto.User, error) {
+// UpdateUserByName - the service that updates a user by its name in the Users table and returns userpb.User
+func (us *UserServer) UpdateUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 
 	name := in.GetName()
 	if name == "" {
-		return &proto.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
+		return &userpb.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
 	}
 	email := in.GetEmail()
 	phoneNumber := in.GetPhoneNumber()
@@ -51,10 +54,11 @@ func (as *UserServer) UpdateUserByName(ctx context.Context, in *proto.User) (*pr
 
 	database.Save(&user)
 
-	return &proto.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *UserServer) UpdateUserByID(ctx context.Context, in *proto.User) (*proto.User, error) {
+// UpdateUserByID - the service that updates a user by its ID in the Users table and returns userpb.User
+func (us *UserServer) UpdateUserByID(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 
 	id := in.GetId()
 	name := in.GetName()
@@ -70,35 +74,38 @@ func (as *UserServer) UpdateUserByID(ctx context.Context, in *proto.User) (*prot
 
 	database.Save(&user)
 
-	return &proto.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *UserServer) DeleteUser(ctx context.Context, in *proto.User) (*proto.Message, error) {
+// DeleteUser - the service that deletes a user by its name in the Users table and returns userpb.User
+func (us *UserServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.Message, error) {
 	name := in.GetName()
 	if name == "" {
-		return &proto.Message{}, status.Error(codes.InvalidArgument, "User's name not specified")
+		return &userpb.Message{}, status.Error(codes.InvalidArgument, "User's name not specified")
 	}
 	var user models.User
 	rowsAffected := database.Where("name =?", name).Find(&user).RowsAffected
 
 	if rowsAffected == 0 {
-		return &proto.Message{}, status.Error(codes.NotFound, "Cannot find a User with this name!")
+		return &userpb.Message{}, status.Error(codes.NotFound, "Cannot find a User with this name!")
 	}
 	database.Delete(&user)
 
-	return &proto.Message{Message: user.Name + " Deleted successfully!"}, nil
+	return &userpb.Message{Message: user.Name + " Deleted successfully!"}, nil
 }
 
-func (as *UserServer) ListUsers(ctx context.Context, in *proto.User) (*proto.ListUser, error) {
+// ListUsers - the service that lists the users in the Users table and returns userpb.User
+func (us *UserServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
-	list := make([]*proto.User, 0)
+	list := make([]*userpb.User, 0)
 	database.Where("deleted_at is null").Order("created_at desc").Limit(100).Find(&list)
-	return &proto.ListUser{
+	return &userpb.ListUser{
 		Users: list,
 	}, nil
 }
 
-func (as *UserServer) GetUserByName(ctx context.Context, in *proto.User) (*proto.User, error) {
+// GetUserByName - the service that gets the user by name in the Users table and returns userpb.User
+func (us *UserServer) GetUserByName(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	fmt.Println(colorYellow, "__________________________________________________________________________________"+
@@ -109,22 +116,23 @@ func (as *UserServer) GetUserByName(ctx context.Context, in *proto.User) (*proto
 		"_______________________________________________________________________________________________________")
 	name := in.GetName()
 	if name == "" {
-		return &proto.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
+		return &userpb.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
 	}
 	var user models.User
 	database.Where(&models.User{Name: name}).Find(&user)
 
-	return &proto.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
 
-func (as *UserServer) GetUserByID(ctx context.Context, in *proto.User) (*proto.User, error) {
+// GetUserByID - the service that gets the user by ID in the Users table and returns userpb.User
+func (us *UserServer) GetUserByID(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	id := in.GetId()
 	var user models.User
 	rowsAffected := database.Where("id = ?", id).Find(&user).RowsAffected
 
 	if rowsAffected == 0 {
-		return &proto.User{}, status.Error(codes.NotFound, "Cannot find a User with this id!")
+		return &userpb.User{}, status.Error(codes.NotFound, "Cannot find a User with this id!")
 	}
 
-	return &proto.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
+	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }

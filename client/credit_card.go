@@ -6,8 +6,7 @@ import (
 
 	db "github.com/flakrimjusufi/grpc-with-rest/database"
 	"github.com/flakrimjusufi/grpc-with-rest/models"
-	"github.com/flakrimjusufi/grpc-with-rest/proto"
-	userpb "github.com/flakrimjusufi/grpc-with-rest/proto"
+	creditpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -20,18 +19,20 @@ const (
 
 var database = db.Connect().Debug()
 
+// CreditCardServer - the grpc server of credit cards
 type CreditCardServer struct {
-	userpb.UnimplementedCreditCardServiceServer
+	creditpb.UnimplementedCreditCardServiceServer
 }
 
-func (cs *CreditCardServer) CreditCards(ctx context.Context, in *proto.CreditCard) (*proto.ListCreditCards, error) {
+// CreditCards - the service that gets a list of credit cards by interacting with models.CreditCards and returns a creditpb.ListCreditCards as a response
+func (cs *CreditCardServer) CreditCards(ctx context.Context, in *creditpb.CreditCard) (*creditpb.ListCreditCards, error) {
 
-	var list []*proto.CreditCard
+	var list []*creditpb.CreditCard
 	var creditCards []*models.CreditCards
 	database.Order("created_at desc").Find(&creditCards)
 
 	for _, card := range creditCards {
-		list = append(list, &proto.CreditCard{
+		list = append(list, &creditpb.CreditCard{
 			Id:          uint32(card.ID),
 			Name:        card.Name,
 			Email:       card.Email,
@@ -47,37 +48,39 @@ func (cs *CreditCardServer) CreditCards(ctx context.Context, in *proto.CreditCar
 		})
 	}
 
-	return &proto.ListCreditCards{
+	return &creditpb.ListCreditCards{
 		CreditCards: list,
 	}, nil
 }
 
+// GetCreditCardByUserName - the service that gets the credit card by userName with models.CreditCards and returns a creditpb.CreditCard as a response
 func (cs *CreditCardServer) GetCreditCardByUserName(ctx context.Context,
-	in *proto.CreditCard) (*proto.CreditCard, error) {
+	in *creditpb.CreditCard) (*creditpb.CreditCard, error) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	name := in.GetName()
 	if name == "" {
-		return &proto.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
+		return &creditpb.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
 	}
 	var creditCard models.CreditCards
 	rowsAffected := database.Where(&models.CreditCards{Name: name}).Find(&creditCard).RowsAffected
 
 	if rowsAffected == 0 {
-		return &proto.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
+		return &creditpb.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
 	}
 
 	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen,
 		"Now sending the response (credit card of selected user) to client side...")
 
-	return &proto.CreditCard{Id: uint32(creditCard.ID), Name: creditCard.Name, Email: creditCard.Email,
+	return &creditpb.CreditCard{Id: uint32(creditCard.ID), Name: creditCard.Name, Email: creditCard.Email,
 		PhoneNumber: creditCard.PhoneNumber, Address: creditCard.Address, Country: creditCard.Country,
 		City: creditCard.City, Zip: creditCard.Zip, Cvv: creditCard.CVV,
 		CreatedAt: timestamppb.New(creditCard.CreatedAt)}, nil
 }
 
+// CreateCreditCardApplication - the service that creates the credit card application with models.CreditCardApplication and returns a creditpb.CreditCardApplication as a response
 func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
-	in *proto.CreditCardApplication) (*proto.CreditCardApplication, error) {
+	in *creditpb.CreditCardApplication) (*creditpb.CreditCardApplication, error) {
 
 	creditCardApplication := models.CreditCardApplication{
 		FirstName:            in.GetFirstName(),
@@ -106,7 +109,7 @@ func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
 	database.NewRecord(creditCardApplication)
 	database.Create(&creditCardApplication)
 
-	return &proto.CreditCardApplication{
+	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
 		FirstName:            creditCardApplication.FirstName,
 		LastName:             creditCardApplication.LastName,
@@ -135,15 +138,16 @@ func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
 	}, nil
 }
 
+// GetCreditCardApplicationByName - the service that gets the credit card from models.CreditCardApplication and returns a creditpb.CreditCardApplication as a response
 func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
-	in *proto.CreditCardApplication) (*proto.CreditCardApplication, error) {
+	in *creditpb.CreditCardApplication) (*creditpb.CreditCardApplication, error) {
 
 	firstName := in.GetFirstName()
 	var creditCardApplication models.CreditCardApplication
 	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
 		Order("created_at desc").First(&creditCardApplication)
 
-	return &proto.CreditCardApplication{
+	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
 		FirstName:            creditCardApplication.FirstName,
 		LastName:             creditCardApplication.LastName,
