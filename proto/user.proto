@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package helloworld;
+package user;
 
 option go_package = "/proto";
 
@@ -49,20 +49,6 @@ service UserService {
   rpc SayHello (User) returns (Message) {
     option (google.api.http) = {
       post: "/api/v1/example/echo"
-      body: "*"
-    };
-  }
-
-  rpc CreatePayload (Payload) returns (Payload) {
-    option (google.api.http) = {
-      post: "/api/v1/payload"
-      body: "*"
-    };
-  }
-
-  rpc PostPayload (AnyPayload) returns (Result) {
-    option (google.api.http) = {
-      post: "/api/v1/postPayload"
       body: "*"
     };
   }

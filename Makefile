@@ -70,26 +70,3 @@ bazel-run: ### runs the project with bazel
     GRPC_GATEWAY_SERVER_PORT=$(GRPC_GATEWAY_SERVER_PORT) \
     bazelisk run //:gazelle
 .PHONY: bazel-run
-
-bazel-test: ### runs the test cases with bazel
-	@echo "::bazel-test"; \
-    bazelisk test \
-    	--action_env=DB_TYPE=$(DB_TYPE) \
-    	--action_env=DB_DATABASE=$(DB_DATABASE) \
-    	--action_env=DB_USERNAME=$(DB_USERNAME) \
-    	--action_env=DB_HOSTNAME=$(DB_HOSTNAME) \
-    	--action_env=DB_PORT=$(DB_PORT) \
-    	--action_env=POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
-    	--action_env=SERVER_HOST=$(SERVER_HOST) \
-    	--action_env=GRPC_SERVER_PORT=$(GRPC_SERVER_PORT) \
-    	--action_env=GRPC_GATEWAY_SERVER_PORT=$(GRPC_GATEWAY_SERVER_PORT) \
-        --platform_suffix="bazel-test" \
-        --@io_bazel_rules_go//go/config:race \
-        --define cluster=$CLUSTER \
-        --define namespace=$NAMESPACE \
-        --test_tag_filters=fast \
-        --build_tag_filters=fast \
-        --test_output=errors \
-        --nocache_test_results \
-        //...
-.PHONY: bazel-test

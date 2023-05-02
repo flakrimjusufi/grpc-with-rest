@@ -64,34 +64,16 @@ You should have a response from server:
 
 ### Bazel 
 
-#### To run the project with Bazel
-
-~~~
-make bazel-run 
-~~~
-
-#### To clean project files that were built using with Bazel
-
-~~~
-make bazel-clean 
-~~~
-
 #### To set up the project with Bazel
 
 ~~~
 make bazel-setup
 ~~~
 
-#### To update dependencies with Bazel
+#### To run the project with Bazel
 
 ~~~
-make bazel-update-deps 
-~~~
-
-#### To run the test-cases with Bazel
-
-~~~
-make bazel-test 
+make bazel-run 
 ~~~
 
 #### In case you don't have docker or bazel installed, you need to do the following:
@@ -101,7 +83,7 @@ make bazel-test
 ### 1. Go
 
 ~~~~
-[https://golang.org/], any one of the three latest major releases of Go.
+[https://golang.org/], any one of the three latest major releases of Go (1.18 was used in this project) 
 For installation instructions, see Go's getting started guide: https://golang.org/doc/install
 ~~~~
 

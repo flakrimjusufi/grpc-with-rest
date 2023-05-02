@@ -2,12 +2,13 @@ package database
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/flakrimjusufi/grpc-with-rest/models"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // imports postgres dialect
 	"github.com/joho/godotenv"
-	"os"
-	"time"
 )
 
 // Connect - connects to the DB
