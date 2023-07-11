@@ -8,15 +8,18 @@ on:
 
 jobs:
 
-  audit:
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.18
+          go-version: '1.20'
+
+      - name: Download dependencies
+        run: go mod tidy
 
       - name: Verify dependencies
         run: go mod verify
@@ -28,7 +31,7 @@ jobs:
         run: go vet ./...
 
       - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@v0.3.0
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Run staticcheck
         run: staticcheck ./...
@@ -39,14 +42,26 @@ jobs:
       - name: Run golint
         run: golint ./...
 
-      - name: Bazel setup
-        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
+  bazel:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+    - uses: actions/checkout@v3
 
-      - name: Update Gazelle with Bazel
-        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update;
+    - name: Install bazelisk
+      run: go install github.com/bazelbuild/bazelisk@latest
 
-      - name: Update dependencies with Bazel
-        run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update-repos -from_file=go.mod;
+    - name: Bazel setup
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
+      continue-on-error: false
 
-      - name: Clean bazel
-        run: bazelisk clean
+    - name: Update Gazelle with Bazel
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update;
+      continue-on-error: false
+
+    - name: Update dependencies with Bazel
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update-repos -from_file=go.mod;
+      continue-on-error: false
+
+    - name: Clean bazel
+      run: bazelisk clean
