@@ -83,7 +83,7 @@ make bazel-run
 ### 1. Go
 
 ~~~~
-[https://golang.org/], any one of the three latest major releases of Go (1.18 was used in this project) 
+[https://golang.org/], any one of the three latest major releases of Go (1.20 was used in this project) 
 For installation instructions, see Go's getting started guide: https://golang.org/doc/install
 ~~~~
 

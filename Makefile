@@ -70,3 +70,12 @@ bazel-run: ### runs the project with bazel
     GRPC_GATEWAY_SERVER_PORT=$(GRPC_GATEWAY_SERVER_PORT) \
     bazelisk run //:gazelle
 .PHONY: bazel-run
+
+
+build-proto: ### builds proto files
+	@echo "::build-proto";
+	@protoc --go_out=. --go_opt=paths=source_relative \
+         --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+         proto/user.proto \
+         && protoc -I . --grpc-gateway_out=logtostderr=true:. proto/user.proto
+.PHONY: build-proto
