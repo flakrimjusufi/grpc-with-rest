@@ -29,7 +29,15 @@ func (cs *CreditCardServer) CreditCards(ctx context.Context, in *creditpb.Credit
 
 	var list []*creditpb.CreditCard
 	var creditCards []*models.CreditCards
-	database.Order("created_at desc").Find(&creditCards)
+	result := database.Order("created_at desc").Find(&creditCards)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreditCards: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer - CreditCards - No credit card was found.")
+	}
 
 	for _, card := range creditCards {
 		list = append(list, &creditpb.CreditCard{
@@ -63,10 +71,14 @@ func (cs *CreditCardServer) GetCreditCardByUserName(ctx context.Context,
 		return &creditpb.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
 	}
 	var creditCard models.CreditCards
-	rowsAffected := database.Where(&models.CreditCards{Name: name}).Find(&creditCard).RowsAffected
+	result := database.Where(&models.CreditCards{Name: name}).Find(&creditCard)
 
-	if rowsAffected == 0 {
-		return &creditpb.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - GetCreditCardByUserName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer - GetCreditCardByUserName - No credit card was found with the given name")
 	}
 
 	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen,
@@ -107,7 +119,10 @@ func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
 	}
 
 	database.NewRecord(creditCardApplication)
-	database.Create(&creditCardApplication)
+	result := database.Create(&creditCardApplication)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCardApplication: %v", result.Error)
+	}
 
 	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
@@ -144,8 +159,16 @@ func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
 
 	firstName := in.GetFirstName()
 	var creditCardApplication models.CreditCardApplication
-	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
+	result := database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
 		Order("created_at desc").First(&creditCardApplication)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - GetCreditCardApplicationByName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer -  GetCreditCardApplicationByName: No credit card application was found with the given name")
+	}
 
 	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
