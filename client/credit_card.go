@@ -2,9 +2,9 @@ package client
 
 import (
 	"context"
+	"gorm.io/gorm"
 	"log"
 
-	db "github.com/flakrimjusufi/grpc-with-rest/database"
 	"github.com/flakrimjusufi/grpc-with-rest/models"
 	creditpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc/codes"
@@ -17,11 +17,10 @@ const (
 	colorPurple = "\033[35m"
 )
 
-var database = db.Connect().Debug()
-
 // CreditCardServer - the grpc server of credit cards
 type CreditCardServer struct {
 	creditpb.UnimplementedCreditCardServiceServer
+	DB *gorm.DB
 }
 
 // CreditCards - the service that gets a list of credit cards by interacting with models.CreditCards and returns a creditpb.ListCreditCards as a response
@@ -29,7 +28,7 @@ func (cs *CreditCardServer) CreditCards(ctx context.Context, in *creditpb.Credit
 
 	var list []*creditpb.CreditCard
 	var creditCards []*models.CreditCards
-	result := database.Order("created_at desc").Find(&creditCards)
+	result := cs.DB.WithContext(ctx).Order("created_at desc").Find(&creditCards)
 
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreditCards: %v", result.Error)
@@ -71,7 +70,7 @@ func (cs *CreditCardServer) GetCreditCardByUserName(ctx context.Context,
 		return &creditpb.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
 	}
 	var creditCard models.CreditCards
-	result := database.Where(&models.CreditCards{Name: name}).Find(&creditCard)
+	result := cs.DB.WithContext(ctx).Where(&models.CreditCards{Name: name}).Find(&creditCard)
 
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "CreditCardServer - GetCreditCardByUserName: %v", result.Error)
@@ -118,8 +117,7 @@ func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
 		CardBranding:         in.GetCardBranding(),
 	}
 
-	database.NewRecord(creditCardApplication)
-	result := database.Create(&creditCardApplication)
+	result := cs.DB.WithContext(ctx).Create(&creditCardApplication)
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCardApplication: %v", result.Error)
 	}
@@ -159,7 +157,7 @@ func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
 
 	firstName := in.GetFirstName()
 	var creditCardApplication models.CreditCardApplication
-	result := database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
+	result := cs.DB.WithContext(ctx).Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
 		Order("created_at desc").First(&creditCardApplication)
 
 	if result.Error != nil {
