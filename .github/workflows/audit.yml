@@ -52,11 +52,15 @@ jobs:
       run: go install github.com/bazelbuild/bazelisk@latest
 
     - name: Bazel setup
-      run: make bazel-setup
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle
+      continue-on-error: false
+
+    - name: Update Gazelle with Bazel
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update;
       continue-on-error: false
 
     - name: Update dependencies with Bazel
-      run: bazel-update-deps
+      run: bazelisk run --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //:gazelle -- update-repos -from_file=go.mod;
       continue-on-error: false
 
     - name: Clean bazel
