@@ -7,8 +7,9 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//models",
-        "@com_github_jinzhu_gorm//:gorm",
-        "@com_github_jinzhu_gorm//dialects/postgres",
         "@com_github_joho_godotenv//:godotenv",
+        "@io_gorm_driver_postgres//:go_default_library",
+        "@io_gorm_gorm//:go_default_library",
+        "@io_gorm_gorm//logger:go_default_library",
     ],
 )

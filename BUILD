@@ -11,6 +11,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//client:client_lib",
+        "//database",
         "//helper",
         "//proto",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
