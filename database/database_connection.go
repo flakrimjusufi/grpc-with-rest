@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// DB - the struct that initializes the database
 type DB struct {
 	Conn *gorm.DB
 }
