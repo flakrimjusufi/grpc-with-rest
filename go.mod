@@ -1,6 +1,6 @@
 module github.com/flakrimjusufi/grpc-with-rest
 
-go 1.22.2
+go 1.22
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.5.0
