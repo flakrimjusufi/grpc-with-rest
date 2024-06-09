@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/flakrimjusufi/grpc-with-rest/client"
 	db "github.com/flakrimjusufi/grpc-with-rest/database"
@@ -52,11 +53,15 @@ func main() {
 		log.Fatalln(s.Serve(lis))
 	}()
 
+	// All the calls that exceeds the 10 seconds threshold, will be cancelled by the server
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	maxMsgSize := 1024 * 1024 * 20
 	// Create a client connection to the gRPC server we just started
 	// This is where the gRPC-Gateway proxies the requests
 	conn, err := grpc.DialContext(
-		context.Background(),
+		ctx,
 		fmt.Sprintf("%s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT")),
 		grpc.WithBlock(),
 		grpc.WithInsecure(),
@@ -68,11 +73,11 @@ func main() {
 
 	gwmux := runtime.NewServeMux()
 	// Register User Service
-	err = userpb.RegisterUserServiceHandler(context.Background(), gwmux, conn)
+	err = userpb.RegisterUserServiceHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
-	newServer := userpb.RegisterCreditCardServiceHandler(context.Background(), gwmux, conn)
+	newServer := userpb.RegisterCreditCardServiceHandler(ctx, gwmux, conn)
 	if newServer != nil {
 		log.Fatalln("Failed to register gateway:", newServer)
 	}
