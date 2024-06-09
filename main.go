@@ -32,7 +32,7 @@ func main() {
 
 	dbConn, err := db.NewDB()
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("failed to connect to the database: %v", err))
+		log.Fatalf(fmt.Sprintf("failed to connect to the database: %v", err))
 	}
 
 	// Create a gRPC server object
