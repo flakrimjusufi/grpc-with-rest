@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/flakrimjusufi/grpc-with-rest/client"
 	db "github.com/flakrimjusufi/grpc-with-rest/database"
