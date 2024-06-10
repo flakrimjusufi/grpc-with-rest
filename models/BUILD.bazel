@@ -5,5 +5,5 @@ go_library(
     srcs = ["data_struct.go"],
     importpath = "github.com/flakrimjusufi/grpc-with-rest/models",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_jinzhu_gorm//:gorm"],
+    deps = ["@io_gorm_gorm//:go_default_library"],
 )

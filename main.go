@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/flakrimjusufi/grpc-with-rest/client"
+	db "github.com/flakrimjusufi/grpc-with-rest/database"
 	"github.com/flakrimjusufi/grpc-with-rest/helper"
 	userpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -17,7 +18,6 @@ import (
 )
 
 func main() {
-
 	if os.Getenv("GRPC_SERVER_PORT") == "" {
 		e := godotenv.Load() //Load .env file for local environment
 		if e != nil {
@@ -30,11 +30,21 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 
+	dbConn, err := db.NewDB()
+	if err != nil {
+		log.Fatalf(fmt.Sprintf("failed to connect to the database: %v", err))
+	}
+
 	// Create a gRPC server object
 	s := grpc.NewServer()
-	// Attach the User service to the server
-	userpb.RegisterUserServiceServer(s, &client.UserServer{})
-	userpb.RegisterCreditCardServiceServer(s, &client.CreditCardServer{})
+
+	// Create service instances with the DB connection
+	userServer := &client.UserServer{DB: dbConn.Conn}
+	creditCardServer := &client.CreditCardServer{DB: dbConn.Conn}
+
+	// Attach the services to the server
+	userpb.RegisterUserServiceServer(s, userServer)
+	userpb.RegisterCreditCardServiceServer(s, creditCardServer)
 
 	// Serve gRPC server
 	log.Printf("Serving gRPC on %s:%s", os.Getenv("SERVER_HOST"), os.Getenv("GRPC_SERVER_PORT"))
