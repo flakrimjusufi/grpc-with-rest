@@ -2,14 +2,13 @@ package client
 
 import (
 	"context"
-	"gorm.io/gorm"
-	"log"
-
 	"github.com/flakrimjusufi/grpc-with-rest/models"
 	creditpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/gorm"
+	"log"
 )
 
 const (
@@ -194,5 +193,39 @@ func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
 		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
 		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
 		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
+// CreateCreditCard - the gRPC service that is used to create credit cards
+func (cs *CreditCardServer) CreateCreditCard(ctx context.Context,
+	in *creditpb.CreditCard) (*creditpb.CreditCard, error) {
+
+	creditCard := models.CreditCards{
+		Name:        in.GetName(),
+		Email:       in.GetEmail(),
+		PhoneNumber: in.GetPhoneNumber(),
+		Address:     in.GetAddress(),
+		Country:     in.GetCountry(),
+		City:        in.GetCity(),
+		Zip:         in.GetZip(),
+		CVV:         in.GetCvv(),
+	}
+
+	result := cs.DB.WithContext(ctx).Create(&creditCard)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCardApplication: %v", result.Error)
+	}
+
+	return &creditpb.CreditCard{
+		Id:          uint32(creditCard.ID),
+		Name:        creditCard.Name,
+		Email:       creditCard.Email,
+		PhoneNumber: creditCard.PhoneNumber,
+		Address:     creditCard.Address,
+		Country:     creditCard.Country,
+		City:        creditCard.City,
+		Zip:         creditCard.Zip,
+		Cvv:         creditCard.CVV,
+		CreatedAt:   timestamppb.New(creditCard.CreatedAt),
 	}, nil
 }
