@@ -76,6 +76,12 @@ service CreditCardService{
       get: "/api/v1/card/application/{firstName}"
     };
   }
+  rpc CreateCreditCard (CreditCard) returns (CreditCard) {
+    option (google.api.http) = {
+      post: "/api/v1/card/create"
+      body: "*"
+    };
+  }
 }
 
 message User {
