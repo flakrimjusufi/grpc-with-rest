@@ -213,7 +213,7 @@ func (cs *CreditCardServer) CreateCreditCard(ctx context.Context,
 
 	result := cs.DB.WithContext(ctx).Create(&creditCard)
 	if result.Error != nil {
-		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCardApplication: %v", result.Error)
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCard: %v", result.Error)
 	}
 
 	return &creditpb.CreditCard{
