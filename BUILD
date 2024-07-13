@@ -1,5 +1,5 @@
-load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:prefix github.com/flakrimjusufi/grpc-with-rest
 gazelle(name = "gazelle")
