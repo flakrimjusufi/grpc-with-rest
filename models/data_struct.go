@@ -16,18 +16,18 @@ type User struct {
 
 // CreditCards - handles the ORM of CreditCards table and the response of gRPC services
 type CreditCards struct {
-	ID          uint   `gorm:"primary_key"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	PhoneNumber string `json:"phoneNumber"`
-	Address     string `json:"address"`
-	Country     string `json:"country"`
-	City        string `json:"city"`
-	Zip         string `json:"zip"`
-	CVV         string `json:"CVV"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   time.Time
+	ID          uint      `gorm:"primary_key"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	PhoneNumber string    `json:"phoneNumber"`
+	Address     string    `json:"address"`
+	Country     string    `json:"country"`
+	City        string    `json:"city"`
+	Zip         string    `json:"zip"`
+	CVV         string    `json:"CVV"`
+	CreatedAt   time.Time `json:"createdAt,omitempty"`
+	UpdatedAt   time.Time `json:"updatedAt,omitempty"`
+	DeletedAt   time.Time `json:"-"`
 }
 
 // CreditCardApplication - handles the ORM of CreditCardApplication table and the response of gRPC services

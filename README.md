@@ -211,9 +211,9 @@ server:
 |    PUT    |       http://localhost:8090/api/v1/user/id/:id        |          Will update a user by Id in database          |
 |    PUT    |     http://localhost:8090/api/v1/user/name/:name      |         Will update a user by name in database         |
 |  DELETE   |     http://localhost:8090/api/v1/user/name/:name      |         Will delete a user by name in database         |
+|   POST    |       http://localhost:8090/api/v1/card/create        |         Will create a credit card application          |
 |    GET    |           http://localhost:8090/api/v1/card           |         Will list all credit cards in database         |
 |    GET    |    http://localhost:8090/api/v1/card/name/Flakrim     |    Will find a credit card by user name in database    |
-|   POST    |           http://localhost:8090/api/v1/card           |         Will create a credit card application          |
 |    GET    | http://localhost:8090/api/v1/card/application/Flakrim | Will find a credit card application by user first name |
 
 ## User Interface
