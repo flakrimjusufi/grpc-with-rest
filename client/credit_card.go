@@ -2,14 +2,13 @@ package client
 
 import (
 	"context"
-	"log"
-
-	db "github.com/flakrimjusufi/grpc-with-rest/database"
 	"github.com/flakrimjusufi/grpc-with-rest/models"
 	creditpb "github.com/flakrimjusufi/grpc-with-rest/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/gorm"
+	"log"
 )
 
 const (
@@ -17,11 +16,10 @@ const (
 	colorPurple = "\033[35m"
 )
 
-var database = db.Connect().Debug()
-
 // CreditCardServer - the grpc server of credit cards
 type CreditCardServer struct {
 	creditpb.UnimplementedCreditCardServiceServer
+	DB *gorm.DB
 }
 
 // CreditCards - the service that gets a list of credit cards by interacting with models.CreditCards and returns a creditpb.ListCreditCards as a response
@@ -29,7 +27,15 @@ func (cs *CreditCardServer) CreditCards(ctx context.Context, in *creditpb.Credit
 
 	var list []*creditpb.CreditCard
 	var creditCards []*models.CreditCards
-	database.Order("created_at desc").Find(&creditCards)
+	result := cs.DB.WithContext(ctx).Order("created_at desc").Find(&creditCards)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreditCards: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer - CreditCards - No credit card was found.")
+	}
 
 	for _, card := range creditCards {
 		list = append(list, &creditpb.CreditCard{
@@ -63,10 +69,14 @@ func (cs *CreditCardServer) GetCreditCardByUserName(ctx context.Context,
 		return &creditpb.CreditCard{}, status.Error(codes.InvalidArgument, "User's name cannot be empty")
 	}
 	var creditCard models.CreditCards
-	rowsAffected := database.Where(&models.CreditCards{Name: name}).Find(&creditCard).RowsAffected
+	result := cs.DB.WithContext(ctx).Where(&models.CreditCards{Name: name}).Find(&creditCard)
 
-	if rowsAffected == 0 {
-		return &creditpb.CreditCard{}, status.Error(codes.NotFound, "Cannot find a credit card with this user name!")
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - GetCreditCardByUserName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer - GetCreditCardByUserName - No credit card was found with the given name")
 	}
 
 	log.Println(colorPurple, "[creditCardService] - [rpc GetCreditCardByUserName] -> ", colorGreen,
@@ -106,8 +116,10 @@ func (cs *CreditCardServer) CreateCreditCardApplication(ctx context.Context,
 		CardBranding:         in.GetCardBranding(),
 	}
 
-	database.NewRecord(creditCardApplication)
-	database.Create(&creditCardApplication)
+	result := cs.DB.WithContext(ctx).Create(&creditCardApplication)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCardApplication: %v", result.Error)
+	}
 
 	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
@@ -144,8 +156,16 @@ func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
 
 	firstName := in.GetFirstName()
 	var creditCardApplication models.CreditCardApplication
-	database.Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
+	result := cs.DB.WithContext(ctx).Unscoped().Where(&models.CreditCardApplication{FirstName: firstName}).
 		Order("created_at desc").First(&creditCardApplication)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - GetCreditCardApplicationByName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "CreditCardServer -  GetCreditCardApplicationByName: No credit card application was found with the given name")
+	}
 
 	return &creditpb.CreditCardApplication{
 		Id:                   uint32(creditCardApplication.ID),
@@ -173,5 +193,39 @@ func (cs *CreditCardServer) GetCreditCardApplicationByName(ctx context.Context,
 		CreatedAt:            timestamppb.New(creditCardApplication.CreatedAt),
 		UpdatedAt:            timestamppb.New(creditCardApplication.UpdatedAt),
 		DeletedAt:            timestamppb.New(creditCardApplication.DeletedAt),
+	}, nil
+}
+
+// CreateCreditCard - the gRPC service that is used to create credit cards
+func (cs *CreditCardServer) CreateCreditCard(ctx context.Context,
+	in *creditpb.CreditCard) (*creditpb.CreditCard, error) {
+
+	creditCard := models.CreditCards{
+		Name:        in.GetName(),
+		Email:       in.GetEmail(),
+		PhoneNumber: in.GetPhoneNumber(),
+		Address:     in.GetAddress(),
+		Country:     in.GetCountry(),
+		City:        in.GetCity(),
+		Zip:         in.GetZip(),
+		CVV:         in.GetCvv(),
+	}
+
+	result := cs.DB.WithContext(ctx).Create(&creditCard)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "CreditCardServer - CreateCreditCard: %v", result.Error)
+	}
+
+	return &creditpb.CreditCard{
+		Id:          uint32(creditCard.ID),
+		Name:        creditCard.Name,
+		Email:       creditCard.Email,
+		PhoneNumber: creditCard.PhoneNumber,
+		Address:     creditCard.Address,
+		Country:     creditCard.Country,
+		City:        creditCard.City,
+		Zip:         creditCard.Zip,
+		Cvv:         creditCard.CVV,
+		CreatedAt:   timestamppb.New(creditCard.CreatedAt),
 	}, nil
 }

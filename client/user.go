@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"gorm.io/gorm"
 	"log"
 
 	"github.com/flakrimjusufi/grpc-with-rest/models"
@@ -19,6 +20,7 @@ const (
 // UserServer - the grpc server of users
 type UserServer struct {
 	userpb.UnimplementedUserServiceServer
+	DB *gorm.DB
 }
 
 // SayHello - the service that prints a given name in the output
@@ -30,8 +32,10 @@ func (us *UserServer) SayHello(ctx context.Context, in *userpb.User) (*userpb.Me
 func (us *UserServer) CreateUser(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	user := models.User{Name: in.Name, Email: in.Email, PhoneNumber: in.PhoneNumber}
 
-	database.NewRecord(user)
-	database.Create(&user)
+	result := us.DB.WithContext(ctx).Create(&user)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - CreateUser: %v", result.Error)
+	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -47,12 +51,23 @@ func (us *UserServer) UpdateUserByName(ctx context.Context, in *userpb.User) (*u
 	phoneNumber := in.GetPhoneNumber()
 
 	var user models.User
-	database.Where("name =?", name).Find(&user)
+	result := us.DB.WithContext(ctx).Where("name =?", name).Find(&user)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - UpdateUserByName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "UserServer - UpdateUserByName - No user was found with the given name")
+	}
 
 	user.Email = email
 	user.PhoneNumber = phoneNumber
 
-	database.Save(&user)
+	save := us.DB.WithContext(ctx).Save(&user)
+	if save.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - UpdateUserByName: %v", save.Error.Error())
+	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -66,13 +81,24 @@ func (us *UserServer) UpdateUserByID(ctx context.Context, in *userpb.User) (*use
 	phoneNumber := in.GetPhoneNumber()
 
 	var user models.User
-	database.Where("id =?", id).Find(&user)
+	result := us.DB.WithContext(ctx).Where("id =?", id).Find(&user)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - UpdateUserByID: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "UserServer - UpdateUserByID - No user was found with the id")
+	}
 
 	user.Name = name
 	user.Email = email
 	user.PhoneNumber = phoneNumber
 
-	database.Save(&user)
+	save := us.DB.WithContext(ctx).Save(&user)
+	if save.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - UpdateUserByName: %v", save.Error)
+	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -84,12 +110,15 @@ func (us *UserServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 		return &userpb.Message{}, status.Error(codes.InvalidArgument, "User's name not specified")
 	}
 	var user models.User
-	rowsAffected := database.Where("name =?", name).Find(&user).RowsAffected
+	rowsAffected := us.DB.WithContext(ctx).Where("name =?", name).Find(&user).RowsAffected
 
 	if rowsAffected == 0 {
-		return &userpb.Message{}, status.Error(codes.NotFound, "Cannot find a User with this name!")
+		return &userpb.Message{}, status.Error(codes.NotFound, "No user was found with the given name")
 	}
-	database.Delete(&user)
+	del := us.DB.WithContext(ctx).Delete(&user)
+	if del.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - UpdateUserByName: %v", del.Error)
+	}
 
 	return &userpb.Message{Message: user.Name + " Deleted successfully!"}, nil
 }
@@ -98,7 +127,14 @@ func (us *UserServer) DeleteUser(ctx context.Context, in *userpb.User) (*userpb.
 func (us *UserServer) ListUsers(ctx context.Context, in *userpb.User) (*userpb.ListUser, error) {
 
 	list := make([]*userpb.User, 0)
-	database.Where("deleted_at is null").Order("created_at desc").Limit(100).Find(&list)
+	result := us.DB.WithContext(ctx).Where("deleted_at is null").Order("created_at desc").Limit(100).Find(&list)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - ListUsers: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "UserServer - ListUsers - No users yet.")
+	}
 	return &userpb.ListUser{
 		Users: list,
 	}, nil
@@ -119,7 +155,14 @@ func (us *UserServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 		return &userpb.User{}, status.Error(codes.InvalidArgument, "User's name not specified")
 	}
 	var user models.User
-	database.Where(&models.User{Name: name}).Find(&user)
+	result := us.DB.WithContext(ctx).Where(&models.User{Name: name}).Find(&user)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - GetUserByName: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, status.Error(codes.NotFound, "UserServer - GetUserByName - No user was found with the given name.")
+	}
 
 	return &userpb.User{Id: uint32(user.ID), Name: user.Name, Email: user.Email, PhoneNumber: user.PhoneNumber}, nil
 }
@@ -128,9 +171,13 @@ func (us *UserServer) GetUserByName(ctx context.Context, in *userpb.User) (*user
 func (us *UserServer) GetUserByID(ctx context.Context, in *userpb.User) (*userpb.User, error) {
 	id := in.GetId()
 	var user models.User
-	rowsAffected := database.Where("id = ?", id).Find(&user).RowsAffected
+	result := us.DB.WithContext(ctx).Where("id = ?", id).Find(&user)
 
-	if rowsAffected == 0 {
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "UserServer - GetUserByID: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
 		return &userpb.User{}, status.Error(codes.NotFound, "Cannot find a User with this id!")
 	}
 

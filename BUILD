@@ -1,5 +1,5 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 # gazelle:prefix github.com/flakrimjusufi/grpc-with-rest
 gazelle(name = "gazelle")
@@ -11,11 +11,14 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//client:client_lib",
+        "//database",
         "//helper",
         "//proto",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
         "@com_github_joho_godotenv//:godotenv",
-        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_golang_google_grpc//keepalive",
     ],
 )
 

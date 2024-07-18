@@ -6,45 +6,64 @@ import (
 	"time"
 
 	"github.com/flakrimjusufi/grpc-with-rest/models"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres" // imports postgres dialect
 	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// Connect - connects to the DB
-func Connect() *gorm.DB {
+// DB - the struct that initializes the database
+type DB struct {
+	Conn *gorm.DB
+}
+
+// NewDB - connects to the DB and returns a new DB struct
+func NewDB() (*DB, error) {
+	// Load environment variables from .env file if not already set
 	if os.Getenv("DB_USERNAME") == "" {
-		e := godotenv.Load() //Load .env file for local environment
-		if e != nil {
-			panic(e)
+		if err := godotenv.Load(); err != nil {
+			return nil, fmt.Errorf("failed to load .env file: %w", err)
 		}
 	}
+
+	// Fetch environment variables
 	username := os.Getenv("DB_USERNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbName := os.Getenv("DB_DATABASE")
 	dbHost := os.Getenv("DB_HOSTNAME")
-	dbType := os.Getenv("DB_TYPE")
 	dbPort := os.Getenv("DB_PORT")
 
-	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username,
-		password, dbName, dbPort) // connection string
+	// Construct the Data Source Name (DSN)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, username, password, dbName, dbPort)
 
-	database, err := gorm.Open(dbType, dbURI)
+	// Open a connection to the database using GORM
+	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to connect to the database: %w", err)
 	}
-	database.Debug().AutoMigrate(models.User{})
-	database.Debug().AutoMigrate(models.CreditCards{})
-	database.Debug().AutoMigrate(models.CreditCardApplication{})
 
-	// SetMaxIdleConnections sets the maximum number of connections in the idle connection pool.
-	database.DB().SetMaxIdleConns(10)
+	// Obtain the underlying sql.DB object to set connection pool settings
+	sqlDB, err := dbConnect.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get database instance: %w", err)
+	}
 
-	// SetMaxOpenConnections sets the maximum number of open connections to the database.
-	database.DB().SetMaxOpenConns(100)
+	// Set the maximum number of idle connections
+	sqlDB.SetMaxIdleConns(10)
 
-	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
-	database.DB().SetConnMaxLifetime(time.Hour)
+	// Set the maximum number of open connections
+	sqlDB.SetMaxOpenConns(100)
 
-	return database
+	// Set the maximum lifetime of connections
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	// Perform automatic migrations for your models
+	if handleErr := dbConnect.AutoMigrate(&models.User{}, &models.CreditCards{}, &models.CreditCardApplication{}); handleErr != nil {
+		return nil, fmt.Errorf("failed to migrate database: %w", handleErr)
+	}
+
+	// Return a new DB struct instance containing the gorm.DB connection
+	return &DB{Conn: dbConnect}, nil
 }
